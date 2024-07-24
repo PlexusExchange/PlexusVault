@@ -1,127 +1,158 @@
-import {
-  time,
-  loadFixture,
-} from "@nomicfoundation/hardhat-toolbox/network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
+// test/vaultTest.ts
+
+import { ethers, waffle } from "hardhat";
 import { expect } from "chai";
-import hre from "hardhat";
+import {
+  PlexusVaultERC20,
+  PlexusVaultFactory,
+  StrategyStargateV2,
+  SimpleSwapper,
+  PlexusFeeConfigurator,
+} from "../typechain";
 
-describe("Lock", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  async function deployOneYearLockFixture() {
-    const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-    const ONE_GWEI = 1_000_000_000;
+describe("VaultTest", function () {
+  let plexusVaultFactory: PlexusVaultFactory;
+  let testPlexusVaultERC20: PlexusVaultERC20;
+  let plexusVault: PlexusVaultERC20;
+  let strategyStargateV2: StrategyStargateV2;
+  let simpleSwapper: SimpleSwapper;
+  let plexusFeeConfigurator: PlexusFeeConfigurator;
+  let mainUser: string;
+  let devUser: string;
+  let addrA: string;
+  let addrB: string;
+  let addrC: string;
 
-    const lockedAmount = ONE_GWEI;
-    const unlockTime = (await time.latest()) + ONE_YEAR_IN_SECS;
+  const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+  const STG_ADDRESS = "0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590";
+  const WNATIVE = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
+  const KEEPER = "0xb612cF824bFf640b5F3E408Eba5EAf2F46E1F09B";
+  const STRATEGIST = "0x0Bb989a2593E7513B44ae408F1e3191E0183b20a";
+  const USDT_WHALE = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
+  const ONEINCH = "0x111111125421cA6dc452d289314280a0f8842A65";
 
-    // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await hre.ethers.getSigners();
+  beforeEach(async function () {
+    const signers = await ethers.getSigners();
+    mainUser = await signers[0].getAddress();
+    devUser = await signers[1].getAddress();
+    addrA = await signers[2].getAddress();
+    addrB = await signers[3].getAddress();
+    addrC = await signers[4].getAddress();
 
-    const Lock = await hre.ethers.getContractFactory("Lock");
-    const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+    const PlexusVaultERC20Factory = await ethers.getContractFactory(
+      "PlexusVaultERC20"
+    );
+    const PlexusVaultFactoryFactory = await ethers.getContractFactory(
+      "PlexusVaultFactory"
+    );
+    const StrategyStargateV2Factory = await ethers.getContractFactory(
+      "StrategyStargateV2"
+    );
+    const SimpleSwapperFactory = await ethers.getContractFactory(
+      "SimpleSwapper"
+    );
+    const PlexusFeeConfiguratorFactory = await ethers.getContractFactory(
+      "PlexusFeeConfigurator"
+    );
 
-    return { lock, unlockTime, lockedAmount, owner, otherAccount };
-  }
+    plexusVault = (await PlexusVaultERC20Factory.deploy()) as PlexusVaultERC20;
+    plexusVaultFactory = (await PlexusVaultFactoryFactory.deploy(
+      plexusVault.address
+    )) as PlexusVaultFactory;
+    strategyStargateV2 =
+      (await StrategyStargateV2Factory.deploy()) as StrategyStargateV2;
+    simpleSwapper = (await SimpleSwapperFactory.deploy(
+      WNATIVE,
+      KEEPER
+    )) as SimpleSwapper;
+    plexusFeeConfigurator =
+      (await PlexusFeeConfiguratorFactory.deploy()) as PlexusFeeConfigurator;
 
-  describe("Deployment", function () {
-    it("Should set the right unlockTime", async function () {
-      const { lock, unlockTime } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.unlockTime()).to.equal(unlockTime);
-    });
-
-    it("Should set the right owner", async function () {
-      const { lock, owner } = await loadFixture(deployOneYearLockFixture);
-
-      expect(await lock.owner()).to.equal(owner.address);
-    });
-
-    it("Should receive and store the funds to lock", async function () {
-      const { lock, lockedAmount } = await loadFixture(
-        deployOneYearLockFixture
-      );
-
-      expect(await hre.ethers.provider.getBalance(lock.target)).to.equal(
-        lockedAmount
-      );
-    });
-
-    it("Should fail if the unlockTime is not in the future", async function () {
-      // We don't use the fixture here because we want a different deployment
-      const latestTime = await time.latest();
-      const Lock = await hre.ethers.getContractFactory("Lock");
-      await expect(Lock.deploy(latestTime, { value: 1 })).to.be.revertedWith(
-        "Unlock time should be in the future"
-      );
-    });
+    testPlexusVaultERC20 =
+      (await plexusVaultFactory.cloneVault()) as PlexusVaultERC20;
   });
 
-  describe("Withdrawals", function () {
-    describe("Validations", function () {
-      it("Should revert with the right error if called too soon", async function () {
-        const { lock } = await loadFixture(deployOneYearLockFixture);
+  it("should initialize contracts", async function () {
+    await plexusFeeConfigurator.initialize(
+      WNATIVE,
+      ethers.utils.parseEther("0.01")
+    ); // 1% fee
+    await plexusFeeConfigurator.setFeeCategory(
+      0,
+      ethers.utils.parseEther("0.01"),
+      "default",
+      true
+    );
 
-        await expect(lock.withdraw()).to.be.revertedWith(
-          "You can't withdraw yet"
-        );
-      });
+    const chef = V2_USDT_FARM;
+    const stargateRouter = V2_USDT_POOL;
+    const rewards = [STG_ADDRESS];
 
-      it("Should revert with the right error if called from another account", async function () {
-        const { lock, unlockTime, otherAccount } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    const commonAddresses = {
+      vault: testPlexusVaultERC20.address,
+      unirouter: simpleSwapper.address,
+      keeper: KEEPER,
+      strategist: STRATEGIST,
+      plexusFeeRecipient: STRATEGIST,
+      plexusFeeConfig: plexusFeeConfigurator.address,
+    };
 
-        // We can increase the time in Hardhat Network
-        await time.increaseTo(unlockTime);
+    await strategyStargateV2.initialize(
+      chef,
+      stargateRouter,
+      WNATIVE,
+      rewards,
+      commonAddresses
+    );
+    await testPlexusVaultERC20.initialize(
+      strategyStargateV2.address,
+      "Plexus StargateV2 USDT",
+      "PlexusStargateV2USDT",
+      21600
+    );
+    await strategyStargateV2.setHarvestOnDeposit(true);
 
-        // We use lock.connect() to send a transaction from another account
-        await expect(lock.connect(otherAccount).withdraw()).to.be.revertedWith(
-          "You aren't the owner"
-        );
-      });
+    const swapInfo_oneinch_STG_WMATIC = {
+      router: ONEINCH,
+      data: "0x8770ba910000000000000000000000002f6f07cdcf3588944bf4c42ac74ff24bf56e75900000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000008000000000000003b6d0340a34ec05da1e4287fa351c74469189345990a3f0c00800000000000003b8b87c0b78906c8a461d6a39a57285c129843e1937c3278ea822ca3",
+      amountIndex: 36,
+    };
 
-      it("Shouldn't fail if the unlockTime has arrived and the owner calls it", async function () {
-        const { lock, unlockTime } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    const swapInfo_oneinch_WMATIC_USDT = {
+      router: ONEINCH,
+      data: "0x83800a8e0000000000000000000000000d500b1d8e8ef31e21c99d1db9a6444d3adf12700000000000000000000000000000000000000000000000000de0b6b3a7640000000000000000000000000000000000000000000000000000000000000000000008800000000000003b6d0340604229c960e5cacf2aaeac8be68ac07ba9df81c3ea822ca3",
+      amountIndex: 36,
+    };
 
-        // Transactions are sent using the first signer by default
-        await time.increaseTo(unlockTime);
+    await simpleSwapper.setSwapInfo(
+      STG_ADDRESS,
+      WNATIVE,
+      swapInfo_oneinch_STG_WMATIC
+    );
+    await simpleSwapper.setSwapInfo(
+      WNATIVE,
+      USDT_ADDRESS,
+      swapInfo_oneinch_WMATIC_USDT
+    );
+  });
 
-        await expect(lock.withdraw()).not.to.be.reverted;
-      });
-    });
+  it("should deposit to vault", async function () {
+    const usdt = await ethers.getContractAt("IERC20", USDT_ADDRESS);
+    const depositAmount = ethers.utils.parseUnits("2000", 6);
 
-    describe("Events", function () {
-      it("Should emit an event on withdrawals", async function () {
-        const { lock, unlockTime, lockedAmount } = await loadFixture(
-          deployOneYearLockFixture
-        );
+    await usdt
+      .connect(mainUser)
+      .approve(testPlexusVaultERC20.address, depositAmount);
+    await testPlexusVaultERC20.connect(mainUser).deposit(depositAmount);
 
-        await time.increaseTo(unlockTime);
+    const balance = await testPlexusVaultERC20.balanceOf(mainUser);
+    expect(balance).to.be.equal(depositAmount);
+  });
 
-        await expect(lock.withdraw())
-          .to.emit(lock, "Withdrawal")
-          .withArgs(lockedAmount, anyValue); // We accept any value as `when` arg
-      });
-    });
-
-    describe("Transfers", function () {
-      it("Should transfer the funds to the owner", async function () {
-        const { lock, unlockTime, lockedAmount, owner } = await loadFixture(
-          deployOneYearLockFixture
-        );
-
-        await time.increaseTo(unlockTime);
-
-        await expect(lock.withdraw()).to.changeEtherBalances(
-          [owner, lock],
-          [lockedAmount, -lockedAmount]
-        );
-      });
-    });
+  it("should advance block", async function () {
+    const currentBlock = await ethers.provider.getBlockNumber();
+    await ethers.provider.send("evm_mine", [currentBlock + 50000]);
+    const newBlock = await ethers.provider.getBlockNumber();
+    expect(newBlock).to.be.equal(currentBlock + 50000);
   });
 });
