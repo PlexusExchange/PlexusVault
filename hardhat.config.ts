@@ -3,7 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const networkName = "POLYGON";
+const networkName = "hardhat";
 
 const config: HardhatUserConfig = {
   defaultNetwork: networkName,

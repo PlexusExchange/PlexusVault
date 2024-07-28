@@ -1,6 +1,6 @@
 // test/vaultTest.ts
 
-import { ethers, waffle } from "hardhat";
+import { ethers, waffle, network } from "hardhat";
 import { expect } from "chai";
 import {
   PlexusVaultERC20,
@@ -8,7 +8,9 @@ import {
   StrategyStargateV2,
   SimpleSwapper,
   PlexusFeeConfigurator,
+  PlexusZapRouter,
 } from "../typechain";
+import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 
 describe("VaultTest", function () {
   let plexusVaultFactory: PlexusVaultFactory;
@@ -17,13 +19,18 @@ describe("VaultTest", function () {
   let strategyStargateV2: StrategyStargateV2;
   let simpleSwapper: SimpleSwapper;
   let plexusFeeConfigurator: PlexusFeeConfigurator;
-  let mainUser: string;
+  let plexusZapRouter: PlexusZapRouter;
+  let mainUser: HardhatEthersSigner;
+  let testPlexusVaultERC20_address: string;
   let devUser: string;
   let addrA: string;
   let addrB: string;
   let addrC: string;
 
+  const IERC20_SOURCE = "contracts/interfaces/common/IERC20.sol:IERC20";
+
   const USDT_ADDRESS = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
+  const USDC_ADDRESS = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
   const STG_ADDRESS = "0x2F6F07CDcf3588944Bf4C42aC74ff24bF56e7590";
   const WNATIVE = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
   const KEEPER = "0xb612cF824bFf640b5F3E408Eba5EAf2F46E1F09B";
@@ -31,13 +38,19 @@ describe("VaultTest", function () {
   const USDT_WHALE = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
   const ONEINCH = "0x111111125421cA6dc452d289314280a0f8842A65";
 
-  beforeEach(async function () {
-    const signers = await ethers.getSigners();
-    mainUser = await signers[0].getAddress();
-    devUser = await signers[1].getAddress();
-    addrA = await signers[2].getAddress();
-    addrB = await signers[3].getAddress();
-    addrC = await signers[4].getAddress();
+  const V2_USDT_FARM = "0x4694900bdba99edf07a2e46c4093f88f9106a90d";
+  const V2_USDT_POOL = "0xd47b03ee6d86Cf251ee7860FB2ACf9f91B9fD4d7";
+
+  before(async function () {
+    const mainUserAddress = "0xb612cF824bFf640b5F3E408Eba5EAf2F46E1F09B";
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [mainUserAddress],
+    });
+
+    mainUser = await ethers.getSigner(mainUserAddress);
+
+    console.log("mainUser", mainUser.address);
 
     const PlexusVaultERC20Factory = await ethers.getContractFactory(
       "PlexusVaultERC20"
@@ -55,9 +68,13 @@ describe("VaultTest", function () {
       "PlexusFeeConfigurator"
     );
 
+    const PlexusZapRouterFactory = await ethers.getContractFactory(
+      "PlexusZapRouter"
+    );
+
     plexusVault = (await PlexusVaultERC20Factory.deploy()) as PlexusVaultERC20;
     plexusVaultFactory = (await PlexusVaultFactoryFactory.deploy(
-      plexusVault.address
+      plexusVault.target
     )) as PlexusVaultFactory;
     strategyStargateV2 =
       (await StrategyStargateV2Factory.deploy()) as StrategyStargateV2;
@@ -68,18 +85,28 @@ describe("VaultTest", function () {
     plexusFeeConfigurator =
       (await PlexusFeeConfiguratorFactory.deploy()) as PlexusFeeConfigurator;
 
-    testPlexusVaultERC20 =
-      (await plexusVaultFactory.cloneVault()) as PlexusVaultERC20;
+    const clonevault_Tx = await plexusVaultFactory.cloneVault();
+    const receipt = await clonevault_Tx.wait();
+
+    testPlexusVaultERC20_address = receipt.logs[0].args[0];
+
+    testPlexusVaultERC20 = await ethers.getContractAt(
+      "PlexusVaultERC20",
+      testPlexusVaultERC20_address
+    );
+
+    plexusZapRouter =
+      (await PlexusZapRouterFactory.deploy()) as PlexusZapRouter;
+
+    console.log("deploy SET");
   });
 
   it("should initialize contracts", async function () {
-    await plexusFeeConfigurator.initialize(
-      WNATIVE,
-      ethers.utils.parseEther("0.01")
-    ); // 1% fee
+    await plexusFeeConfigurator.initialize(WNATIVE, ethers.parseEther("0.05")); // 5% fee
+
     await plexusFeeConfigurator.setFeeCategory(
       0,
-      ethers.utils.parseEther("0.01"),
+      ethers.parseEther("0.01"),
       "default",
       true
     );
@@ -89,12 +116,12 @@ describe("VaultTest", function () {
     const rewards = [STG_ADDRESS];
 
     const commonAddresses = {
-      vault: testPlexusVaultERC20.address,
-      unirouter: simpleSwapper.address,
+      vault: testPlexusVaultERC20_address,
+      unirouter: simpleSwapper.target,
       keeper: KEEPER,
       strategist: STRATEGIST,
       plexusFeeRecipient: STRATEGIST,
-      plexusFeeConfig: plexusFeeConfigurator.address,
+      plexusFeeConfig: plexusFeeConfigurator.target,
     };
 
     await strategyStargateV2.initialize(
@@ -104,8 +131,9 @@ describe("VaultTest", function () {
       rewards,
       commonAddresses
     );
+
     await testPlexusVaultERC20.initialize(
-      strategyStargateV2.address,
+      strategyStargateV2.target,
       "Plexus StargateV2 USDT",
       "PlexusStargateV2USDT",
       21600
@@ -137,22 +165,26 @@ describe("VaultTest", function () {
   });
 
   it("should deposit to vault", async function () {
-    const usdt = await ethers.getContractAt("IERC20", USDT_ADDRESS);
-    const depositAmount = ethers.utils.parseUnits("2000", 6);
+    const usdt = await ethers.getContractAt(IERC20_SOURCE, USDT_ADDRESS);
+    const depositAmount = ethers.parseUnits("3", 6);
+    console.log("CHECK CONSOLE", depositAmount);
 
     await usdt
       .connect(mainUser)
-      .approve(testPlexusVaultERC20.address, depositAmount);
+      .approve(testPlexusVaultERC20_address, depositAmount);
+    console.log("CHECK CONSOLE");
+
+    console.log(
+      "usdt ALLOWANCe",
+      await usdt.allowance(mainUser, testPlexusVaultERC20_address)
+    );
+
     await testPlexusVaultERC20.connect(mainUser).deposit(depositAmount);
+    console.log("CHECK CONSOLE");
 
     const balance = await testPlexusVaultERC20.balanceOf(mainUser);
     expect(balance).to.be.equal(depositAmount);
   });
 
-  it("should advance block", async function () {
-    const currentBlock = await ethers.provider.getBlockNumber();
-    await ethers.provider.send("evm_mine", [currentBlock + 50000]);
-    const newBlock = await ethers.provider.getBlockNumber();
-    expect(newBlock).to.be.equal(currentBlock + 50000);
-  });
+  it("should swap-deposit to zapRouter", async function () {});
 });

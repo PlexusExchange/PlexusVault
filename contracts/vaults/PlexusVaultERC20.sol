@@ -143,7 +143,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
     function withdraw(uint256 _shares) public {
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
-
         uint b = want().balanceOf(address(this));
         if (b < r) {
             uint _withdraw = r - b;
