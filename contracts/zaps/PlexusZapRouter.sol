@@ -60,7 +60,6 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      */
     function executeOrder(Order calldata _order, Step[] calldata _route) external payable nonReentrant whenNotPaused {
         if (msg.sender != _order.user) revert InvalidCaller(_order.user, msg.sender);
-
         IPlexusTokenManager(tokenManager).pullTokens(_order.user, _order.inputs);
         _executeOrder(_order, _route);
     }
@@ -126,7 +125,6 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
             (bool success, bytes memory result) = stepTarget.call{value: value}(callData);
             if (!success) _propagateError(stepTarget, value, callData, result);
 
-
             unchecked {
                 ++i;
             }
@@ -183,6 +181,7 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
                 }
             } else {
                 balance = IERC20(outputToken).balanceOf(address(this));
+
                 if (balance < outputMinAmount) {
                     revert Slippage(outputToken, outputMinAmount, balance);
                 } else if (balance > 0) {

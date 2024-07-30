@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 import "./PlexusVaultERC20.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
-import "hardhat/console.sol";
 
 // Minimal proxy pattern for creating new PlexusVaultERC20 vaults
 contract PlexusVaultFactory {

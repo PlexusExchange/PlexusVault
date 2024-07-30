@@ -51,9 +51,7 @@ contract SimpleSwapper {
         address router = swapData.router;
         if (router == address(0)) revert NoSwapData(_fromToken, _toToken);
         bytes memory data = swapData.data;
-
         data = _insertData(data, swapData.amountIndex, abi.encode(_amountIn));
-
         _approveTokenIfNeeded(_fromToken, router);
         (bool success, ) = router.call(data);
         if (!success) revert SwapFailed(router, data);
