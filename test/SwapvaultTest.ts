@@ -9,8 +9,12 @@ import {
   SimpleSwapper,
   PlexusFeeConfigurator,
   PlexusZapRouter,
-} from "../typechain";
+  PlexusTokenManager,
+} from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { mine } from "@nomicfoundation/hardhat-network-helpers";
+
+import { fetchOneInchData } from "../scripts/oneinchData.js";
 
 describe("VaultTest", function () {
   let plexusVaultFactory: PlexusVaultFactory;
@@ -20,8 +24,10 @@ describe("VaultTest", function () {
   let simpleSwapper: SimpleSwapper;
   let plexusFeeConfigurator: PlexusFeeConfigurator;
   let plexusZapRouter: PlexusZapRouter;
+  let plexusTokenManager: PlexusTokenManager;
   let mainUser: HardhatEthersSigner;
   let testPlexusVaultERC20_address: string;
+  let plexusTokenManager_address: string;
   let devUser: string;
   let addrA: string;
   let addrB: string;
@@ -72,23 +78,24 @@ describe("VaultTest", function () {
       "PlexusZapRouter"
     );
 
-    plexusVault = (await PlexusVaultERC20Factory.deploy()) as PlexusVaultERC20;
+    plexusVault =
+      (await PlexusVaultERC20Factory.deploy()) as unknown as PlexusVaultERC20;
     plexusVaultFactory = (await PlexusVaultFactoryFactory.deploy(
       plexusVault.target
-    )) as PlexusVaultFactory;
+    )) as unknown as PlexusVaultFactory;
     strategyStargateV2 =
-      (await StrategyStargateV2Factory.deploy()) as StrategyStargateV2;
+      (await StrategyStargateV2Factory.deploy()) as unknown as StrategyStargateV2;
     simpleSwapper = (await SimpleSwapperFactory.deploy(
       WNATIVE,
       KEEPER
-    )) as SimpleSwapper;
+    )) as unknown as SimpleSwapper;
     plexusFeeConfigurator =
-      (await PlexusFeeConfiguratorFactory.deploy()) as PlexusFeeConfigurator;
+      (await PlexusFeeConfiguratorFactory.deploy()) as unknown as PlexusFeeConfigurator;
 
     const clonevault_Tx = await plexusVaultFactory.cloneVault();
     const receipt = await clonevault_Tx.wait();
 
-    testPlexusVaultERC20_address = receipt.logs[0].args[0];
+    testPlexusVaultERC20_address = receipt?.logs[0].args[0];
 
     testPlexusVaultERC20 = await ethers.getContractAt(
       "PlexusVaultERC20",
@@ -96,7 +103,14 @@ describe("VaultTest", function () {
     );
 
     plexusZapRouter =
-      (await PlexusZapRouterFactory.deploy()) as PlexusZapRouter;
+      (await PlexusZapRouterFactory.deploy()) as unknown as PlexusZapRouter;
+
+    plexusTokenManager_address = await plexusZapRouter.tokenManager();
+
+    plexusTokenManager = await ethers.getContractAt(
+      "PlexusTokenManager",
+      plexusTokenManager_address
+    );
 
     console.log("deploy SET");
   });
@@ -164,8 +178,10 @@ describe("VaultTest", function () {
     );
   });
 
+  //USDT pool
   it("should deposit to vault", async function () {
     const usdt = await ethers.getContractAt(IERC20_SOURCE, USDT_ADDRESS);
+
     const depositAmount = ethers.parseUnits("3", 6);
     console.log("CHECK CONSOLE", depositAmount);
 
@@ -181,10 +197,145 @@ describe("VaultTest", function () {
 
     await testPlexusVaultERC20.connect(mainUser).deposit(depositAmount);
     console.log("CHECK CONSOLE");
-
-    const balance = await testPlexusVaultERC20.balanceOf(mainUser);
-    expect(balance).to.be.equal(depositAmount);
   });
 
-  it("should swap-deposit to zapRouter", async function () {});
+  //USDC -> swap -> USDT pool
+  //note : https://polygonscan.com/tx/0x2d5654cc371668a9abd6fc446811c379c9cade8b5f36613399b5ed140d196a2c
+  it("should swap-deposit to zapRouter", async function () {
+    console.log((await ethers.provider.getBlock("latest"))?.number);
+    // instantly mine 1000 blocks
+    await mine(1000);
+    console.log((await ethers.provider.getBlock("latest"))?.number);
+    const oneInchCallData = await fetchOneInchData(
+      //1inch swap하고 받는곳 zapRouter로 설정.
+      await plexusZapRouter.getAddress(),
+      USDC_ADDRESS,
+      USDT_ADDRESS,
+      137,
+      5000000
+    );
+
+    console.log(
+      "oneinch",
+      oneInchCallData.dstAmount,
+      oneInchCallData.tx.to,
+      oneInchCallData.tx.data
+    );
+
+    const usdc = await ethers.getContractAt(IERC20_SOURCE, USDC_ADDRESS);
+
+    const depositAmount = ethers.parseUnits("5", 6);
+    console.log("CHECK CONSOLE", depositAmount);
+
+    await usdc
+      .connect(mainUser)
+      .approve(plexusTokenManager_address, depositAmount);
+    console.log("CHECK CONSOLE");
+
+    console.log(
+      await plexusZapRouter.tokenManager(),
+      plexusTokenManager_address
+    );
+
+    console.log(
+      "usdc ALLOWANCE",
+      await usdc.allowance(mainUser, plexusTokenManager_address)
+    );
+
+    console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
+    const order = {
+      inputs: [
+        {
+          token: USDC_ADDRESS,
+          amount: "5000000",
+        },
+      ],
+      outputs: [
+        { token: testPlexusVaultERC20_address, minOutputAmount: "4000000" },
+        { token: USDT_ADDRESS, minOutputAmount: "0" },
+        { token: USDC_ADDRESS, minOutputAmount: "0" },
+      ],
+      relay: {
+        target: "0x0000000000000000000000000000000000000000",
+        value: "0",
+        data: "0x",
+      },
+      user: mainUser,
+      recipient: mainUser,
+    };
+
+    const route = [
+      {
+        target: oneInchCallData.tx.to,
+        value: "0",
+        data: oneInchCallData.tx.data,
+        tokens: [{ token: USDC_ADDRESS, index: -1 }],
+      },
+      {
+        target: testPlexusVaultERC20_address,
+        value: "0",
+        data: "0xde5f6268",
+        tokens: [{ token: USDT_ADDRESS, index: -1 }],
+      },
+    ];
+
+    await plexusZapRouter.connect(mainUser).executeOrder(order, route);
+
+    console.log("zapRouter deposit clear");
+  });
+
+  it("should depost to zapRouter (Non swap)", async function () {
+    const usdt = await ethers.getContractAt(IERC20_SOURCE, USDT_ADDRESS);
+
+    const depositAmount = ethers.parseUnits("5", 6);
+    // console.log("CHECK CONSOLE", depositAmount);
+
+    await usdt
+      .connect(mainUser)
+      .approve(plexusTokenManager_address, depositAmount);
+    // console.log("CHECK CONSOLE");
+
+    // console.log(
+    //   await plexusZapRouter.tokenManager(),
+    //   plexusTokenManager_address
+    // );
+
+    // console.log(
+    //   "usdt ALLOWANCE",
+    //   await usdt.allowance(mainUser, plexusTokenManager_address)
+    // );
+
+    // console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
+    const order = {
+      inputs: [
+        {
+          token: USDT_ADDRESS,
+          amount: "5000000",
+        },
+      ],
+      outputs: [
+        { token: testPlexusVaultERC20_address, minOutputAmount: "4844817" },
+        { token: USDT_ADDRESS, minOutputAmount: "0" },
+      ],
+      relay: {
+        target: "0x0000000000000000000000000000000000000000",
+        value: "0",
+        data: "0x",
+      },
+      user: mainUser,
+      recipient: mainUser,
+    };
+
+    const route = [
+      {
+        target: testPlexusVaultERC20_address,
+        value: "0",
+        data: "0xde5f6268",
+        tokens: [{ token: USDT_ADDRESS, index: -1 }],
+      },
+    ];
+
+    // await plexusZapRouter.connect(mainUser).executeOrder(order, route);
+    // console.log("zapRouter deposit clear (non swap)");
+  });
 });

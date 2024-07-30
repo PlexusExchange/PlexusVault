@@ -134,8 +134,7 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
             }
         }
     }
-    // uniswap => STG -> WMATIC 경로가없으면 STG => USDCe => WMATIC
-    // 1inch =>
+
 
     // performance fees
     function _chargeFees() internal {
