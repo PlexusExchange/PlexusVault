@@ -50,15 +50,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         approvalDelay = _approvalDelay;
     }
 
-    //test
-    address constant BEEFY_USDT_VAULT = 0xE97319aBA72938379c94fAe2C1fFfC40973c4A01;
-    function beefyDeposit(uint _amount) public nonReentrant {
-        want().safeTransferFrom(msg.sender, address(this), _amount);
-        want().safeTransfer(BEEFY_USDT_VAULT, _amount);
-        IERC20Upgradeable(want()).safeApprove(BEEFY_USDT_VAULT, _amount);
-        IBeefyVaultV7(BEEFY_USDT_VAULT).deposit(_amount);
-    }
-    //
 
     function want() public view returns (IERC20Upgradeable) {
         return IERC20Upgradeable(strategy.want());
