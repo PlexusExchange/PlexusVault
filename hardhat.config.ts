@@ -12,49 +12,49 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
       gas: 30000000, // 원하는 가스 리밋 값으로 조절
       gasPrice: 150000000000, // 100000000 => 0.1gwei 50000000000 => 50gwei
-      //8160067549528925
+
       forking: {
-        url: process.env.MAIN_POLYGON_URL,
+        url: process.env.MAIN_POLYGON_URL as string,
       },
     },
     ETH: {
       url: process.env.MAIN_ETH_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     POLYGON: {
       allowUnlimitedContractSize: true,
       url: process.env.MAIN_POLYGON_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
       gasPrice: 300000000000,
     },
     BNB: {
       url: process.env.MAIN_BNB_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     ARBI: {
       url: process.env.MAIN_ARBI_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     FANTOM: {
       url: process.env.MAIN_FANTOM_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     KAVA: {
       url: process.env.MAIN_KAVA_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
       gasPrice: 1000000000,
     },
     AVAX: {
       url: process.env.MAIN_AVAX_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     OP: {
       url: process.env.MAIN_OP_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     AURORA: {
       url: process.env.MAIN_AURORA_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     // GNOSIS: {
     //   url: process.env.MAIN_GNOSIS_URL,
@@ -62,28 +62,28 @@ const config: HardhatUserConfig = {
     // },
     KLAY: {
       url: process.env.MAIN_KLAY_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
       gasPrice: 50000000000,
     },
     LINEA: {
       url: process.env.MAIN_LINEA_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     ZKEVM: {
       url: process.env.MAIN_ZKEVM_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     BASE: {
       url: process.env.MAIN_BASE_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     SCROLL: {
       url: process.env.MAIN_SCROLL_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
     MANTLE: {
       url: process.env.MAIN_MANTLE_URL,
-      accounts: [process.env.MAIN_PKEY],
+      accounts: [process.env.MAIN_PKEY as string],
     },
   },
   solidity: {

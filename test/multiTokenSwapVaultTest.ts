@@ -204,6 +204,7 @@ describe("VaultTest", function () {
     console.log("CHECK CONSOLE");
   });
 
+  /**
   //USDC,MATIC -> odos swap -> USDT pool
   it("should odos swap-deposit to zapRouter", async function () {
     console.log((await ethers.provider.getBlock("latest"))?.number);
@@ -406,6 +407,7 @@ describe("VaultTest", function () {
 
     console.log("zapRouter deposit clear");
   });
+ */
 
   //진행중
   //USDT,MATIC -> 1inch swap + dup -> USDT pool

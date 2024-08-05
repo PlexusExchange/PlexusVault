@@ -12,7 +12,6 @@ import {IPlexusTokenManager} from "../interfaces/common/IPlexusTokenManager.sol"
 import {IPlexusZapRouter} from "../interfaces/common/IPlexusZapRouter.sol";
 import {PlexusTokenManager} from "./PlexusTokenManager.sol";
 import {ZapErrors} from "../infra/ZapErrors.sol";
-import "hardhat/console.sol";
 
 /**
  * @title Zap router for Plexus vaults
@@ -109,7 +108,6 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
 
                 if (stepTokenAddress == address(0)) {
                     value = address(this).balance;
-                    console.log("IN HEAR",value);
 
                 } else {
                     balance = IERC20(stepTokenAddress).balanceOf(address(this));
@@ -124,9 +122,7 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
                     ++j;
                 }
             }
-            console.log("before odos");
             (bool success, bytes memory result) = stepTarget.call{value: value}(callData);
-            console.log("after odos");
             if (!success) _propagateError(stepTarget, value, callData, result);
 
             unchecked {
