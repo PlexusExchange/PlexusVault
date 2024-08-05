@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "../utils/Pausable.sol";
 import "../interfaces/plexus/IStrategy.sol";
 import "../interfaces/plexus/IBeefyVaultV7.sol";
 
@@ -14,7 +15,7 @@ import "../interfaces/plexus/IBeefyVaultV7.sol";
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable,Pausable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     struct StratCandidate {
@@ -31,6 +32,10 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
 
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);
+    event Deposit(address indexed user, uint256 shares, uint256 amount0, uint256 amount1, uint256 fee0, uint256 fee1);
+    event Withdraw(address indexed user, uint256 shares, uint256 amount0, uint256 amount1);
+
+
 
     /**
      * @dev Sets the value of {token} to the token that the vault will
@@ -50,15 +55,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         approvalDelay = _approvalDelay;
     }
 
-    //test
-    address constant BEEFY_USDT_VAULT = 0xE97319aBA72938379c94fAe2C1fFfC40973c4A01;
-    function beefyDeposit(uint _amount) public nonReentrant {
-        want().safeTransferFrom(msg.sender, address(this), _amount);
-        want().safeTransfer(BEEFY_USDT_VAULT, _amount);
-        IERC20Upgradeable(want()).safeApprove(BEEFY_USDT_VAULT, _amount);
-        IBeefyVaultV7(BEEFY_USDT_VAULT).deposit(_amount);
-    }
-    //
 
     function want() public view returns (IERC20Upgradeable) {
         return IERC20Upgradeable(strategy.want());
@@ -115,7 +111,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         } else {
             shares = (_amount * totalSupply()) / _pool;
         }
-        //userDeposit(want(), _amount);
+        emit Deposit( msg.sender,  shares,  uint256(_amount),0, 0,0);
         _mint(msg.sender, shares);
     }
 
@@ -154,7 +150,8 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
                 r = b + _diff;
             }
         }
-        //userWithdraw(want(), _amount);
+        
+        emit Withdraw(msg.sender, r,0,0);
         want().safeTransfer(msg.sender, r);
     }
 

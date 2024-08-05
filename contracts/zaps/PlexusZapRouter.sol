@@ -108,6 +108,7 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
 
                 if (stepTokenAddress == address(0)) {
                     value = address(this).balance;
+
                 } else {
                     balance = IERC20(stepTokenAddress).balanceOf(address(this));
                     _approveToken(stepTokenAddress, stepTarget, balance);
@@ -121,7 +122,6 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
                     ++j;
                 }
             }
-
             (bool success, bytes memory result) = stepTarget.call{value: value}(callData);
             if (!success) _propagateError(stepTarget, value, callData, result);
 
