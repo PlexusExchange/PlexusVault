@@ -6,7 +6,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../../interfaces/common/IERC20Extended.sol";
 import "../Common/StratFeeManagerInitializable.sol";
 import "../../interfaces/plexus/IPlexusSwapper.sol";
+
 import "../../utils/UniV3Actions.sol";
+import "../../utils/UniswapV3Utils.sol";
 
 interface IComet {
     function supply(address asset, uint amount) external;
@@ -24,7 +26,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
     // Tokens used
     address public constant wnative = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
-    address public constant output = 0x8505b9d2254A7Ae468c0E9dd10Ccea3A837aef5c;
+    address public constant output = 0x8505b9d2254A7Ae468c0E9dd10Ccea3A837aef5c; // comp
     address public want;
     address public cToken;
 
@@ -32,17 +34,20 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
     ICometRewards public constant rewards = ICometRewards(0x45939657d1CA34A8FA39A924B71D28Fe8431e581);
     bool public harvestOnDeposit;
     uint256 public lastHarvest;
-
+    
     bytes public outputToNativePath;
-    bytes public wnativeToWantPath;
+    bytes public nativeToWantPath;
+    
 
     event StratHarvest(address indexed harvester, uint256 wantHarvested, uint256 tvl);
     event Deposit(uint256 tvl);
     event Withdraw(uint256 tvl);
-    // event ChargedFees(uint256 callFees, uint256 plexusFees, uint256 strategistFees);
-    event ChargedFees(uint256 plexusFees);
+    event ChargedFees(uint256 callFees);
 
-    function initialize(address _cToken, CommonAddresses calldata _commonAddresses) public initializer {
+    function initialize(
+        address _cToken,
+        CommonAddresses calldata _commonAddresses
+     ) public initializer  {
         __StratFeeManager_init(_commonAddresses);
         cToken = _cToken;
         want = IComet(cToken).baseToken();
@@ -78,7 +83,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         }
 
         if (tx.origin != owner() && !paused()) {
-            uint256 withdrawalFeeAmount = (_amount * withdrawalFee) / WITHDRAWAL_MAX;
+            uint256 withdrawalFeeAmount = _amount * withdrawalFee / WITHDRAWAL_MAX;
             _amount = _amount - withdrawalFeeAmount;
         }
 
@@ -94,54 +99,50 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         }
     }
 
-    // function harvest() external virtual {
-    //     _harvest(tx.origin);
-    // }
-
     function harvest() external virtual {
         _harvest();
     }
 
+  
+
     // compounds earnings and charges performance fee
     function _harvest() internal whenNotPaused {
+        uint256 beforeBal = balanceOfWant();
         rewards.claim(cToken, address(this), true);
-        uint256 bal = IERC20(output).balanceOf(address(this));
-        if (bal > 0) {
-            _swapRewardsToNative();
+        _swapRewardsToNative();
+        uint256 wnativeBal = IERC20(wnative).balanceOf(address(this));
+        if (wnativeBal > 0) {
             _chargeFees();
-            _swapToWant();
-            uint256 wantHarvested = balanceOfWant();
-            deposit();
-
+            _swapToWant(wnative, want);
+            uint256 wantHarvested = balanceOfWant() - beforeBal;
             lastHarvest = block.timestamp;
+            deposit();
             emit StratHarvest(msg.sender, wantHarvested, balanceOf());
         }
     }
 
-    function _swapRewardsToNative() internal whenNotPaused {
-        uint256 amount = IERC20(output).balanceOf(address(this));
-        if (amount > 0) {
-            IPlexusSwapper(unirouter).swap(output, wnative, amount);
+    function _swapRewardsToNative() internal {
+        uint bal = IERC20(output).balanceOf(address(this));
+        if (bal > 0) {
+            IPlexusSwapper(swapper).swap(output, wnative, bal);
+
         }
+         
     }
 
     // performance fees
     function _chargeFees() internal {
         IFeeConfig.FeeCategory memory fees = getFees();
         uint256 wnativeBal = (IERC20(wnative).balanceOf(address(this)) * fees.total) / DIVISOR;
-
         uint256 plexusFeeAmount = (wnativeBal * fees.plexus) / DIVISOR;
         IERC20(wnative).safeTransfer(plexusFeeRecipient, plexusFeeAmount);
-
         emit ChargedFees(plexusFeeAmount);
     }
 
     // Adds liquidity to AMM and gets more LP tokens.
-    function _swapToWant() internal {
-        uint256 bal = IERC20(wnative).balanceOf(address(this));
-        if (wnativeToWantPath.length > 0) {
-            UniV3Actions.swapV3(unirouter, wnativeToWantPath, bal);
-        }
+    function _swapToWant(address tokenFrom, address tokenTo) internal {
+        uint bal = IERC20(tokenFrom).balanceOf(address(this));
+        IPlexusSwapper(swapper).swap(tokenFrom, tokenTo, bal);
     }
 
     // calculate the total underlaying 'want' held by the strat.
@@ -191,6 +192,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
     // pauses deposits and withdraws all funds from third party systems.
     function panic() public onlyManager {
+
         IComet(cToken).withdraw(want, balanceOfPool());
         pause();
     }
@@ -209,14 +211,18 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
     }
 
     function _giveAllowances() internal {
-        IERC20(output).approve(unirouter, type(uint).max);
-        IERC20(wnative).approve(unirouter, type(uint).max);
+        IERC20(output).approve(swapper, type(uint).max);
+        IERC20(wnative).approve(swapper, type(uint).max);
         IERC20(want).approve(cToken, type(uint).max);
     }
 
     function _removeAllowances() internal {
-        IERC20(output).approve(unirouter, 0);
-        IERC20(wnative).approve(unirouter, 0);
+        IERC20(output).approve(swapper, 0);
+        IERC20(wnative).approve(swapper, 0);
         IERC20(want).approve(cToken, 0);
     }
+
+   
+
+    
 }

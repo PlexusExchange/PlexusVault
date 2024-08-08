@@ -94,6 +94,8 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         deposit(want().balanceOf(msg.sender));
     }
 
+    
+
     /**
      * @dev The entrypoint of funds into the system. People deposit with this function
      * into the vault. The vault is then in charge of sending funds into the strategy.
@@ -138,6 +140,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
      * tokens are burned in the process.
      */
     function withdraw(uint256 _shares) public {
+  
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
         uint b = want().balanceOf(address(this));
@@ -151,7 +154,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
             }
         }
         
-        emit Withdraw(msg.sender, r,0,0);
+        emit Withdraw(msg.sender, _shares, r,0);
         want().safeTransfer(msg.sender, r);
     }
 

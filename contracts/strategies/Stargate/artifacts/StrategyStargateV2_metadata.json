@@ -1,1263 +1,1263 @@
 {
-	"compiler": {
-		"version": "0.8.19+commit.7dd6d404"
-	},
-	"language": "Solidity",
-	"output": {
-		"abi": [
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "plexusFees",
-						"type": "uint256"
-					}
-				],
-				"name": "ChargedFees",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "tvl",
-						"type": "uint256"
-					}
-				],
-				"name": "Deposit",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint8",
-						"name": "version",
-						"type": "uint8"
-					}
-				],
-				"name": "Initialized",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "previousOwner",
-						"type": "address"
-					},
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "newOwner",
-						"type": "address"
-					}
-				],
-				"name": "OwnershipTransferred",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					}
-				],
-				"name": "Paused",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "keeper",
-						"type": "address"
-					}
-				],
-				"name": "SetKeeper",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "plexusFeeConfig",
-						"type": "address"
-					}
-				],
-				"name": "SetPlexusFeeConfig",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "plexusFeeRecipient",
-						"type": "address"
-					}
-				],
-				"name": "SetPlexusFeeRecipient",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "feeId",
-						"type": "uint256"
-					}
-				],
-				"name": "SetStratFeeId",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "strategist",
-						"type": "address"
-					}
-				],
-				"name": "SetStrategist",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "unirouter",
-						"type": "address"
-					}
-				],
-				"name": "SetUnirouter",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "vault",
-						"type": "address"
-					}
-				],
-				"name": "SetVault",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "withdrawalFee",
-						"type": "uint256"
-					}
-				],
-				"name": "SetWithdrawalFee",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": true,
-						"internalType": "address",
-						"name": "harvester",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "wantHarvested",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "tvl",
-						"type": "uint256"
-					}
-				],
-				"name": "StratHarvest",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "account",
-						"type": "address"
-					}
-				],
-				"name": "Unpaused",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "tvl",
-						"type": "uint256"
-					}
-				],
-				"name": "Withdraw",
-				"type": "event"
-			},
-			{
-				"inputs": [],
-				"name": "WITHDRAWAL_FEE_CAP",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "WITHDRAWAL_MAX",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_token",
-						"type": "address"
-					}
-				],
-				"name": "addReward",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "balanceOf",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "balanceOfPool",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "balanceOfWant",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "beforeDeposit",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "callReward",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "chef",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "convertRate",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "deposit",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "depositFee",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "getAllFees",
-				"outputs": [
-					{
-						"components": [
-							{
-								"components": [
-									{
-										"internalType": "uint256",
-										"name": "total",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "plexus",
-										"type": "uint256"
-									},
-									{
-										"internalType": "string",
-										"name": "label",
-										"type": "string"
-									},
-									{
-										"internalType": "bool",
-										"name": "active",
-										"type": "bool"
-									}
-								],
-								"internalType": "struct IFeeConfig.FeeCategory",
-								"name": "performance",
-								"type": "tuple"
-							},
-							{
-								"internalType": "uint256",
-								"name": "deposit",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "withdraw",
-								"type": "uint256"
-							}
-						],
-						"internalType": "struct IFeeConfig.AllFees",
-						"name": "",
-						"type": "tuple"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "getStratFeeId",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "harvest",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "harvestOnDeposit",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_chef",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "_stargateRouter",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "_wnative",
-						"type": "address"
-					},
-					{
-						"internalType": "address[]",
-						"name": "_rewards",
-						"type": "address[]"
-					},
-					{
-						"components": [
-							{
-								"internalType": "address",
-								"name": "vault",
-								"type": "address"
-							},
-							{
-								"internalType": "address",
-								"name": "unirouter",
-								"type": "address"
-							},
-							{
-								"internalType": "address",
-								"name": "keeper",
-								"type": "address"
-							},
-							{
-								"internalType": "address",
-								"name": "strategist",
-								"type": "address"
-							},
-							{
-								"internalType": "address",
-								"name": "plexusFeeRecipient",
-								"type": "address"
-							},
-							{
-								"internalType": "address",
-								"name": "plexusFeeConfig",
-								"type": "address"
-							}
-						],
-						"internalType": "struct StratFeeManagerInitializable.CommonAddresses",
-						"name": "_commonAddresses",
-						"type": "tuple"
-					}
-				],
-				"name": "initialize",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "keeper",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "lastHarvest",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "lockDuration",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "lockedProfit",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "lpToken",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "minAmounts",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "owner",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "panic",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "pause",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "paused",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "plexusFeeConfig",
-				"outputs": [
-					{
-						"internalType": "contract IFeeConfig",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "plexusFeeRecipient",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "i",
-						"type": "uint256"
-					}
-				],
-				"name": "removeReward",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "renounceOwnership",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "resetRewards",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "retireStrat",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"name": "rewards",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "rewardsAvailable",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "rewardsLength",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "bool",
-						"name": "_harvestOnDeposit",
-						"type": "bool"
-					}
-				],
-				"name": "setHarvestOnDeposit",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_keeper",
-						"type": "address"
-					}
-				],
-				"name": "setKeeper",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_duration",
-						"type": "uint256"
-					}
-				],
-				"name": "setLockDuration",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_plexusFeeConfig",
-						"type": "address"
-					}
-				],
-				"name": "setPlexusFeeConfig",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_plexusFeeRecipient",
-						"type": "address"
-					}
-				],
-				"name": "setPlexusFeeRecipient",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "token",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "minAmount",
-						"type": "uint256"
-					}
-				],
-				"name": "setRewardMinAmount",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_feeId",
-						"type": "uint256"
-					}
-				],
-				"name": "setStratFeeId",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_strategist",
-						"type": "address"
-					}
-				],
-				"name": "setStrategist",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_unirouter",
-						"type": "address"
-					}
-				],
-				"name": "setUnirouter",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_vault",
-						"type": "address"
-					}
-				],
-				"name": "setVault",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_fee",
-						"type": "uint256"
-					}
-				],
-				"name": "setWithdrawalFee",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "stargateRouter",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "strategist",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "totalLocked",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "newOwner",
-						"type": "address"
-					}
-				],
-				"name": "transferOwnership",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "unirouter",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "unpause",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "_unirouter",
-						"type": "address"
-					}
-				],
-				"name": "updateUnirouter",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "vault",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "want",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_amount",
-						"type": "uint256"
-					}
-				],
-				"name": "withdraw",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "withdrawFee",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [],
-				"name": "wnative",
-				"outputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"stateMutability": "payable",
-				"type": "receive"
-			}
-		],
-		"devdoc": {
-			"events": {
-				"Initialized(uint8)": {
-					"details": "Triggered when the contract has been initialized or reinitialized."
-				},
-				"Paused(address)": {
-					"details": "Emitted when the pause is triggered by `account`."
-				},
-				"Unpaused(address)": {
-					"details": "Emitted when the pause is lifted by `account`."
-				}
-			},
-			"kind": "dev",
-			"methods": {
-				"owner()": {
-					"details": "Returns the address of the current owner."
-				},
-				"paused()": {
-					"details": "Returns true if the contract is paused, and false otherwise."
-				},
-				"renounceOwnership()": {
-					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
-				},
-				"transferOwnership(address)": {
-					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
-				}
-			},
-			"version": 1
-		},
-		"userdoc": {
-			"kind": "user",
-			"methods": {},
-			"version": 1
-		}
-	},
-	"settings": {
-		"compilationTarget": {
-			"src/strategies/Stargate/StrategyStargateV2.sol": "StrategyStargateV2"
-		},
-		"evmVersion": "paris",
-		"libraries": {},
-		"metadata": {
-			"bytecodeHash": "ipfs"
-		},
-		"optimizer": {
-			"enabled": true,
-			"runs": 200
-		},
-		"remappings": [
-			":@openzeppelin-2/=node_modules/@openzeppelin-2/",
-			":@openzeppelin-4/=node_modules/@openzeppelin-4/",
-			":@openzeppelin/=node_modules/@openzeppelin/",
-			":@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
-			":@openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/"
-		]
-	},
-	"sources": {
-		"forge-std/console.sol": {
-			"keccak256": "0x91d5413c2434ca58fd278b6e1e79fd98d10c83931cc2596a6038eee4daeb34ba",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://91ccea707361e48b9b7a161fe81f496b9932bc471e9c4e4e1e9c283f2453cc70",
-				"dweb:/ipfs/QmcB66sZhQ6Kz7MUHcLE78YXRUZxoZnnxZjN6yATsbB2ec"
-			]
-		},
-		"lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol": {
-			"keccak256": "0x4075622496acc77fd6d4de4cc30a8577a744d5c75afad33fdeacf1704d6eda98",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://99c8cb3cd19a44bbfb6612605affb7d8b06cee1f6aa9362a37a8672b4f7eeaf8",
-				"dweb:/ipfs/QmasyxFDBUp7k5KFgfDWEzM8PYSKEq7GVznzMJ1VxVRF4B"
-			]
-		},
-		"lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol": {
-			"keccak256": "0x89be10e757d242e9b18d5a32c9fbe2019f6d63052bbe46397a430a1d60d7f794",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://f103ee2e4aecd37aac6ceefe670709cdd7613dee25fa2d4d9feaf7fc0aaa155e",
-				"dweb:/ipfs/QmRiNZLoJk5k3HPMYGPGjZFd2ke1ZxjhJZkM45Ec9GH9hv"
-			]
-		},
-		"lib/openzeppelin-contracts-upgradeable/contracts/security/PausableUpgradeable.sol": {
-			"keccak256": "0x40c636b4572ff5f1dc50cf22097e93c0723ee14eff87e99ac2b02636eeca1250",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://9c7d1f5e15633ab912b74c2f57e24559e66b03232300d4b27ff0f25bc452ecad",
-				"dweb:/ipfs/QmYTJkc1cntYkKQ1Tu11nBcJLakiy93Tjytc4XHELo4GmR"
-			]
-		},
-		"lib/openzeppelin-contracts-upgradeable/contracts/utils/AddressUpgradeable.sol": {
-			"keccak256": "0x9c80f545915582e63fe206c6ce27cbe85a86fc10b9cd2a0e8c9488fb7c2ee422",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://310136ad60820af4177a11a61d77a3686faf5fca4942b600e08fc940db38396b",
-				"dweb:/ipfs/QmbCzMNSTL7Zi7M4UCSqBrkHtp4jjxUnGbkneCZKdR1qeq"
-			]
-		},
-		"lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol": {
-			"keccak256": "0x963ea7f0b48b032eef72fe3a7582edf78408d6f834115b9feadd673a4d5bd149",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://d6520943ea55fdf5f0bafb39ed909f64de17051bc954ff3e88c9e5621412c79c",
-				"dweb:/ipfs/QmWZ4rAKTQbNG2HxGs46AcTXShsVytKeLs7CUCdCSv5N7a"
-			]
-		},
-		"node_modules/@openzeppelin-4/contracts/token/ERC20/IERC20.sol": {
-			"keccak256": "0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34",
-				"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr"
-			]
-		},
-		"node_modules/@openzeppelin-4/contracts/token/ERC20/extensions/draft-IERC20Permit.sol": {
-			"keccak256": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://b2717fd2bdac99daa960a6de500754ea1b932093c946388c381da48658234b95",
-				"dweb:/ipfs/QmP6QVMn6UeA3ByahyJbYQr5M6coHKBKsf3ySZSfbyA8R7"
-			]
-		},
-		"node_modules/@openzeppelin-4/contracts/token/ERC20/utils/SafeERC20.sol": {
-			"keccak256": "0x032807210d1d7d218963d7355d62e021a84bf1b3339f4f50be2f63b53cccaf29",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://11756f42121f6541a35a8339ea899ee7514cfaa2e6d740625fcc844419296aa6",
-				"dweb:/ipfs/QmekMuk6BY4DAjzeXr4MSbKdgoqqsZnA8JPtuyWc6CwXHf"
-			]
-		},
-		"node_modules/@openzeppelin-4/contracts/utils/Address.sol": {
-			"keccak256": "0xd6153ce99bcdcce22b124f755e72553295be6abcd63804cfdffceb188b8bef10",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://35c47bece3c03caaa07fab37dd2bb3413bfbca20db7bd9895024390e0a469487",
-				"dweb:/ipfs/QmPGWT2x3QHcKxqe6gRmAkdakhbaRgx3DLzcakHz5M4eXG"
-			]
-		},
-		"src/interfaces/common/IERC20Extended.sol": {
-			"keccak256": "0xb9f419cced8c0eb680598ceadccaf2baf6616b16724971fcdebb69d539b85390",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://8c064422b15f80ce42e8ad5e70a7d4a682bb5a06f1b30ce790660f50f68cd904",
-				"dweb:/ipfs/QmfNoWmKZXc3y34drJLcv8LwZSKyFXfvChUUN39AeLi9xx"
-			]
-		},
-		"src/interfaces/common/IFeeConfig.sol": {
-			"keccak256": "0x29340c36f8d12819f5259067d3da7e2ca9a20616a867ded248fcab3b5769a9d3",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://09ef6879534bf1df3e7cac577de6109c77132af735381fa9ef38dd1d4f078dd5",
-				"dweb:/ipfs/QmWLxevQEJpcfZKPpo4GkYP3EtyXEndDqLdEeSipHYXL5R"
-			]
-		},
-		"src/interfaces/common/IWrappedNative.sol": {
-			"keccak256": "0x6051fc2e15a474c3acc157c3b9a0da2f14ac92adae51174b041a9debb75a37c5",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://91575751f1de52095425abb4367feab6d9445f64e44ef91e765f5ad6f751e2b5",
-				"dweb:/ipfs/QmUZ7Yg7BwK7TgnsoohCK6KLaDdVroQVPV4AsSfZ3h3ask"
-			]
-		},
-		"src/interfaces/plexus/IPlexusSwapper.sol": {
-			"keccak256": "0x4f9fd26ab84c24551cfe98d1864a1e7be207aa903c58123a7d4fa36632159064",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://7a7c80c25103f027b2aa04234c6524b194112a5132fea7db44d01975e7afe3b5",
-				"dweb:/ipfs/QmNu4JcBPz3z3WYWvwuUMetc24mJFMTW2L7Wjx6Dvz8Bhn"
-			]
-		},
-		"src/interfaces/stargate/IStargateV2Chef.sol": {
-			"keccak256": "0xb47d4b4c27d37df78df6e13abc66c4ea0df1a6c1b774167aee8b5ff72a309a0b",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://6ad8c525a210ddd2621700b89c4198d68934bf4217326a1eb5aedc25b15f29a1",
-				"dweb:/ipfs/QmV8LbvhV5PDDd5m1LbfyJqyLCpjxzKdwVeJdUXcYJvs54"
-			]
-		},
-		"src/interfaces/stargate/IStargateV2Router.sol": {
-			"keccak256": "0x71e57c47e1fb757b347535b43db333f7df189c8dc12dde24cb90896c347fe3a5",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://313d8daaa1e447999e94817f1fd9436d1d8fcb0ecff9f900bd73447e775c6c66",
-				"dweb:/ipfs/QmTJ5raMYaLMUUjaHyMWUX8we7tChfwkSDP44T3TDoefi4"
-			]
-		},
-		"src/strategies/Common/StratFeeManagerInitializable.sol": {
-			"keccak256": "0x8374fd3ccea21ffd72cae59d2dc1cd36d456f85eedd1dc52c352c9124095e45c",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://31ffa7ad72f8919af0762cef4bc956059c79741531ba9c28a72d31646be4f6d7",
-				"dweb:/ipfs/QmSK7Bwsc4ayR4WovBgex7amjW8RfozFQx6y4S5AdtHbyt"
-			]
-		},
-		"src/strategies/Stargate/StrategyStargateV2.sol": {
-			"keccak256": "0x732b6df534ab36845e4a46d4cc50cf72ca00a2b459a8a0fe50c1cff95c540c83",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://28993735c4f7d66803ca5edc40203eab1a049c8b0b3909127c36dffbef402022",
-				"dweb:/ipfs/Qmce9e91NemM52LjZ1KzGVb6p5S3GUk5jhtLxNae2TwZwD"
-			]
-		}
-	},
-	"version": 1
+  "compiler": {
+    "version": "0.8.19+commit.7dd6d404"
+  },
+  "language": "Solidity",
+  "output": {
+    "abi": [
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "plexusFees",
+            "type": "uint256"
+          }
+        ],
+        "name": "ChargedFees",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "tvl",
+            "type": "uint256"
+          }
+        ],
+        "name": "Deposit",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "version",
+            "type": "uint8"
+          }
+        ],
+        "name": "Initialized",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "Paused",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "keeper",
+            "type": "address"
+          }
+        ],
+        "name": "SetKeeper",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "plexusFeeConfig",
+            "type": "address"
+          }
+        ],
+        "name": "SetPlexusFeeConfig",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "plexusFeeRecipient",
+            "type": "address"
+          }
+        ],
+        "name": "SetPlexusFeeRecipient",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "feeId",
+            "type": "uint256"
+          }
+        ],
+        "name": "SetStratFeeId",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "strategist",
+            "type": "address"
+          }
+        ],
+        "name": "SetStrategist",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "swapper",
+            "type": "address"
+          }
+        ],
+        "name": "SetSwapper",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "vault",
+            "type": "address"
+          }
+        ],
+        "name": "SetVault",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "withdrawalFee",
+            "type": "uint256"
+          }
+        ],
+        "name": "SetWithdrawalFee",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "harvester",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "wantHarvested",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "tvl",
+            "type": "uint256"
+          }
+        ],
+        "name": "StratHarvest",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "Unpaused",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "tvl",
+            "type": "uint256"
+          }
+        ],
+        "name": "Withdraw",
+        "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "WITHDRAWAL_FEE_CAP",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "WITHDRAWAL_MAX",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_token",
+            "type": "address"
+          }
+        ],
+        "name": "addReward",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "balanceOf",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "balanceOfPool",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "balanceOfWant",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "beforeDeposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "callReward",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "chef",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "convertRate",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "deposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "depositFee",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllFees",
+        "outputs": [
+          {
+            "components": [
+              {
+                "components": [
+                  {
+                    "internalType": "uint256",
+                    "name": "total",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "plexus",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "string",
+                    "name": "label",
+                    "type": "string"
+                  },
+                  {
+                    "internalType": "bool",
+                    "name": "active",
+                    "type": "bool"
+                  }
+                ],
+                "internalType": "struct IFeeConfig.FeeCategory",
+                "name": "performance",
+                "type": "tuple"
+              },
+              {
+                "internalType": "uint256",
+                "name": "deposit",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "withdraw",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct IFeeConfig.AllFees",
+            "name": "",
+            "type": "tuple"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getStratFeeId",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "harvest",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "harvestOnDeposit",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_chef",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "_stargateRouter",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "_wnative",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "_rewards",
+            "type": "address[]"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "vault",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "swapper",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "keeper",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "strategist",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "plexusFeeRecipient",
+                "type": "address"
+              },
+              {
+                "internalType": "address",
+                "name": "plexusFeeConfig",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct StratFeeManagerInitializable.CommonAddresses",
+            "name": "_commonAddresses",
+            "type": "tuple"
+          }
+        ],
+        "name": "initialize",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "keeper",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "lastHarvest",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "lockDuration",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "lockedProfit",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "lpToken",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "name": "minAmounts",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "panic",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "pause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "paused",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "plexusFeeConfig",
+        "outputs": [
+          {
+            "internalType": "contract IFeeConfig",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "plexusFeeRecipient",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "i",
+            "type": "uint256"
+          }
+        ],
+        "name": "removeReward",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "resetRewards",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "retireStrat",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "rewards",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "rewardsAvailable",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "rewardsLength",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bool",
+            "name": "_harvestOnDeposit",
+            "type": "bool"
+          }
+        ],
+        "name": "setHarvestOnDeposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_keeper",
+            "type": "address"
+          }
+        ],
+        "name": "setKeeper",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "_duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "setLockDuration",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_plexusFeeConfig",
+            "type": "address"
+          }
+        ],
+        "name": "setPlexusFeeConfig",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_plexusFeeRecipient",
+            "type": "address"
+          }
+        ],
+        "name": "setPlexusFeeRecipient",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minAmount",
+            "type": "uint256"
+          }
+        ],
+        "name": "setRewardMinAmount",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "_feeId",
+            "type": "uint256"
+          }
+        ],
+        "name": "setStratFeeId",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_strategist",
+            "type": "address"
+          }
+        ],
+        "name": "setStrategist",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_swapper",
+            "type": "address"
+          }
+        ],
+        "name": "setSwapper",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_vault",
+            "type": "address"
+          }
+        ],
+        "name": "setVault",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "_fee",
+            "type": "uint256"
+          }
+        ],
+        "name": "setWithdrawalFee",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "stargateRouter",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "strategist",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalLocked",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "swapper",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "unpause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_swapper",
+            "type": "address"
+          }
+        ],
+        "name": "updateSwapper",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "vault",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "want",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "_amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "withdrawFee",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "wnative",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "stateMutability": "payable",
+        "type": "receive"
+      }
+    ],
+    "devdoc": {
+      "events": {
+        "Initialized(uint8)": {
+          "details": "Triggered when the contract has been initialized or reinitialized."
+        },
+        "Paused(address)": {
+          "details": "Emitted when the pause is triggered by `account`."
+        },
+        "Unpaused(address)": {
+          "details": "Emitted when the pause is lifted by `account`."
+        }
+      },
+      "kind": "dev",
+      "methods": {
+        "owner()": {
+          "details": "Returns the address of the current owner."
+        },
+        "paused()": {
+          "details": "Returns true if the contract is paused, and false otherwise."
+        },
+        "renounceOwnership()": {
+          "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+        },
+        "transferOwnership(address)": {
+          "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+        }
+      },
+      "version": 1
+    },
+    "userdoc": {
+      "kind": "user",
+      "methods": {},
+      "version": 1
+    }
+  },
+  "settings": {
+    "compilationTarget": {
+      "src/strategies/Stargate/StrategyStargateV2.sol": "StrategyStargateV2"
+    },
+    "evmVersion": "paris",
+    "libraries": {},
+    "metadata": {
+      "bytecodeHash": "ipfs"
+    },
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "remappings": [
+      ":@openzeppelin-2/=node_modules/@openzeppelin-2/",
+      ":@openzeppelin-4/=node_modules/@openzeppelin-4/",
+      ":@openzeppelin/=node_modules/@openzeppelin/",
+      ":@openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/",
+      ":@openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/"
+    ]
+  },
+  "sources": {
+    "forge-std/console.sol": {
+      "keccak256": "0x91d5413c2434ca58fd278b6e1e79fd98d10c83931cc2596a6038eee4daeb34ba",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://91ccea707361e48b9b7a161fe81f496b9932bc471e9c4e4e1e9c283f2453cc70",
+        "dweb:/ipfs/QmcB66sZhQ6Kz7MUHcLE78YXRUZxoZnnxZjN6yATsbB2ec"
+      ]
+    },
+    "lib/openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol": {
+      "keccak256": "0x4075622496acc77fd6d4de4cc30a8577a744d5c75afad33fdeacf1704d6eda98",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://99c8cb3cd19a44bbfb6612605affb7d8b06cee1f6aa9362a37a8672b4f7eeaf8",
+        "dweb:/ipfs/QmasyxFDBUp7k5KFgfDWEzM8PYSKEq7GVznzMJ1VxVRF4B"
+      ]
+    },
+    "lib/openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol": {
+      "keccak256": "0x89be10e757d242e9b18d5a32c9fbe2019f6d63052bbe46397a430a1d60d7f794",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://f103ee2e4aecd37aac6ceefe670709cdd7613dee25fa2d4d9feaf7fc0aaa155e",
+        "dweb:/ipfs/QmRiNZLoJk5k3HPMYGPGjZFd2ke1ZxjhJZkM45Ec9GH9hv"
+      ]
+    },
+    "lib/openzeppelin-contracts-upgradeable/contracts/security/PausableUpgradeable.sol": {
+      "keccak256": "0x40c636b4572ff5f1dc50cf22097e93c0723ee14eff87e99ac2b02636eeca1250",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://9c7d1f5e15633ab912b74c2f57e24559e66b03232300d4b27ff0f25bc452ecad",
+        "dweb:/ipfs/QmYTJkc1cntYkKQ1Tu11nBcJLakiy93Tjytc4XHELo4GmR"
+      ]
+    },
+    "lib/openzeppelin-contracts-upgradeable/contracts/utils/AddressUpgradeable.sol": {
+      "keccak256": "0x9c80f545915582e63fe206c6ce27cbe85a86fc10b9cd2a0e8c9488fb7c2ee422",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://310136ad60820af4177a11a61d77a3686faf5fca4942b600e08fc940db38396b",
+        "dweb:/ipfs/QmbCzMNSTL7Zi7M4UCSqBrkHtp4jjxUnGbkneCZKdR1qeq"
+      ]
+    },
+    "lib/openzeppelin-contracts-upgradeable/contracts/utils/ContextUpgradeable.sol": {
+      "keccak256": "0x963ea7f0b48b032eef72fe3a7582edf78408d6f834115b9feadd673a4d5bd149",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://d6520943ea55fdf5f0bafb39ed909f64de17051bc954ff3e88c9e5621412c79c",
+        "dweb:/ipfs/QmWZ4rAKTQbNG2HxGs46AcTXShsVytKeLs7CUCdCSv5N7a"
+      ]
+    },
+    "node_modules/@openzeppelin-4/contracts/token/ERC20/IERC20.sol": {
+      "keccak256": "0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34",
+        "dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr"
+      ]
+    },
+    "node_modules/@openzeppelin-4/contracts/token/ERC20/extensions/draft-IERC20Permit.sol": {
+      "keccak256": "0xf41ca991f30855bf80ffd11e9347856a517b977f0a6c2d52e6421a99b7840329",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://b2717fd2bdac99daa960a6de500754ea1b932093c946388c381da48658234b95",
+        "dweb:/ipfs/QmP6QVMn6UeA3ByahyJbYQr5M6coHKBKsf3ySZSfbyA8R7"
+      ]
+    },
+    "node_modules/@openzeppelin-4/contracts/token/ERC20/utils/SafeERC20.sol": {
+      "keccak256": "0x032807210d1d7d218963d7355d62e021a84bf1b3339f4f50be2f63b53cccaf29",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://11756f42121f6541a35a8339ea899ee7514cfaa2e6d740625fcc844419296aa6",
+        "dweb:/ipfs/QmekMuk6BY4DAjzeXr4MSbKdgoqqsZnA8JPtuyWc6CwXHf"
+      ]
+    },
+    "node_modules/@openzeppelin-4/contracts/utils/Address.sol": {
+      "keccak256": "0xd6153ce99bcdcce22b124f755e72553295be6abcd63804cfdffceb188b8bef10",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://35c47bece3c03caaa07fab37dd2bb3413bfbca20db7bd9895024390e0a469487",
+        "dweb:/ipfs/QmPGWT2x3QHcKxqe6gRmAkdakhbaRgx3DLzcakHz5M4eXG"
+      ]
+    },
+    "src/interfaces/common/IERC20Extended.sol": {
+      "keccak256": "0xb9f419cced8c0eb680598ceadccaf2baf6616b16724971fcdebb69d539b85390",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://8c064422b15f80ce42e8ad5e70a7d4a682bb5a06f1b30ce790660f50f68cd904",
+        "dweb:/ipfs/QmfNoWmKZXc3y34drJLcv8LwZSKyFXfvChUUN39AeLi9xx"
+      ]
+    },
+    "src/interfaces/common/IFeeConfig.sol": {
+      "keccak256": "0x29340c36f8d12819f5259067d3da7e2ca9a20616a867ded248fcab3b5769a9d3",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://09ef6879534bf1df3e7cac577de6109c77132af735381fa9ef38dd1d4f078dd5",
+        "dweb:/ipfs/QmWLxevQEJpcfZKPpo4GkYP3EtyXEndDqLdEeSipHYXL5R"
+      ]
+    },
+    "src/interfaces/common/IWrappedNative.sol": {
+      "keccak256": "0x6051fc2e15a474c3acc157c3b9a0da2f14ac92adae51174b041a9debb75a37c5",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://91575751f1de52095425abb4367feab6d9445f64e44ef91e765f5ad6f751e2b5",
+        "dweb:/ipfs/QmUZ7Yg7BwK7TgnsoohCK6KLaDdVroQVPV4AsSfZ3h3ask"
+      ]
+    },
+    "src/interfaces/plexus/IPlexusSwapper.sol": {
+      "keccak256": "0x4f9fd26ab84c24551cfe98d1864a1e7be207aa903c58123a7d4fa36632159064",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://7a7c80c25103f027b2aa04234c6524b194112a5132fea7db44d01975e7afe3b5",
+        "dweb:/ipfs/QmNu4JcBPz3z3WYWvwuUMetc24mJFMTW2L7Wjx6Dvz8Bhn"
+      ]
+    },
+    "src/interfaces/stargate/IStargateV2Chef.sol": {
+      "keccak256": "0xb47d4b4c27d37df78df6e13abc66c4ea0df1a6c1b774167aee8b5ff72a309a0b",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://6ad8c525a210ddd2621700b89c4198d68934bf4217326a1eb5aedc25b15f29a1",
+        "dweb:/ipfs/QmV8LbvhV5PDDd5m1LbfyJqyLCpjxzKdwVeJdUXcYJvs54"
+      ]
+    },
+    "src/interfaces/stargate/IStargateV2Router.sol": {
+      "keccak256": "0x71e57c47e1fb757b347535b43db333f7df189c8dc12dde24cb90896c347fe3a5",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://313d8daaa1e447999e94817f1fd9436d1d8fcb0ecff9f900bd73447e775c6c66",
+        "dweb:/ipfs/QmTJ5raMYaLMUUjaHyMWUX8we7tChfwkSDP44T3TDoefi4"
+      ]
+    },
+    "src/strategies/Common/StratFeeManagerInitializable.sol": {
+      "keccak256": "0x8374fd3ccea21ffd72cae59d2dc1cd36d456f85eedd1dc52c352c9124095e45c",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://31ffa7ad72f8919af0762cef4bc956059c79741531ba9c28a72d31646be4f6d7",
+        "dweb:/ipfs/QmSK7Bwsc4ayR4WovBgex7amjW8RfozFQx6y4S5AdtHbyt"
+      ]
+    },
+    "src/strategies/Stargate/StrategyStargateV2.sol": {
+      "keccak256": "0x732b6df534ab36845e4a46d4cc50cf72ca00a2b459a8a0fe50c1cff95c540c83",
+      "license": "MIT",
+      "urls": [
+        "bzz-raw://28993735c4f7d66803ca5edc40203eab1a049c8b0b3909127c36dffbef402022",
+        "dweb:/ipfs/Qmce9e91NemM52LjZ1KzGVb6p5S3GUk5jhtLxNae2TwZwD"
+      ]
+    }
+  },
+  "version": 1
 }
