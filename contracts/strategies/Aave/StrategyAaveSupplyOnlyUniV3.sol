@@ -134,7 +134,7 @@ contract StrategyAaveSupplyOnlyUniV3 is StratFeeManagerInitializable {
     function _chargeFees() internal {
         IFeeConfig.FeeCategory memory fees = getFees();
         uint256 toNative = (IERC20(output).balanceOf(address(this)) * fees.total) / DIVISOR;
-        UniswapV3Utils.swap(unirouter, outputToNativePath, toNative);
+        UniswapV3Utils.swap(swapper, outputToNativePath, toNative);
 
         uint256 stratFees = IERC20(wnative).balanceOf(address(this));
 
@@ -147,7 +147,7 @@ contract StrategyAaveSupplyOnlyUniV3 is StratFeeManagerInitializable {
     // swap rewards to {want}
     function _swapRewards() internal {
         uint256 outputBal = IERC20(output).balanceOf(address(this));
-        UniswapV3Utils.swap(unirouter, outputToWantPath, outputBal);
+        UniswapV3Utils.swap(swapper, outputToWantPath, outputBal);
     }
 
     // return supply and borrow balance
@@ -241,12 +241,12 @@ contract StrategyAaveSupplyOnlyUniV3 is StratFeeManagerInitializable {
 
     function _giveAllowances() internal {
         IERC20(want).safeApprove(lendingPool, type(uint).max);
-        IERC20(output).safeApprove(unirouter, type(uint).max);
+        IERC20(output).safeApprove(swapper, type(uint).max);
     }
 
     function _removeAllowances() internal {
         IERC20(want).safeApprove(lendingPool, 0);
-        IERC20(output).safeApprove(unirouter, 0);
+        IERC20(output).safeApprove(swapper, 0);
     }
 
     function outputToNative() external view returns (address[] memory) {

@@ -37,14 +37,13 @@ async function fetchOneInchData(
   }
 }
 
-// 최상위 레벨에서 async 함수 호출
 // (async () => {
 //   const result = await fetchOneInchData(
 //     diamond,
-//     "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
-//     "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+//     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+//     "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
 //     137,
-//     5000000
+//     1000000000000000000
 //   );
 
 //   console.log("fetchOneInchData result", result);

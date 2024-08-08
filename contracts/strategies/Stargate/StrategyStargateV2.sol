@@ -28,7 +28,6 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
     event StratHarvest(address indexed harvester, uint256 wantHarvested, uint256 tvl);
     event Deposit(uint256 tvl);
     event Withdraw(uint256 tvl);
-    // event ChargedFees(uint256 callFees, uint256 plexusFees, uint256 strategistFees);
     event ChargedFees(uint256 plexusFees);
 
     // Third party contracts
@@ -116,7 +115,7 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         uint256 wnativeBal = IERC20(wnative).balanceOf(address(this));
         if (wnativeBal > 0) {
             _chargeFees();
-            _swap(wnative, want);
+            _swapToWant(wnative, want);
             uint256 wantHarvested = balanceOfWant() - beforeBal;
             totalLocked = wantHarvested + lockedProfit();
             lastHarvest = block.timestamp;
@@ -130,7 +129,7 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
             address token = rewards[i];
             uint256 amount = IERC20(token).balanceOf(address(this));
             if (amount > minAmounts[token]) {
-                IPlexusSwapper(unirouter).swap(token, wnative, amount);
+                IPlexusSwapper(swapper).swap(token, wnative, amount);
             }
         }
     }
@@ -145,9 +144,9 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         emit ChargedFees(plexusFeeAmount);
     }
 
-    function _swap(address tokenFrom, address tokenTo) internal {
+    function _swapToWant(address tokenFrom, address tokenTo) internal {
         uint bal = IERC20(tokenFrom).balanceOf(address(this));
-        IPlexusSwapper(unirouter).swap(tokenFrom, tokenTo, bal);
+        IPlexusSwapper(swapper).swap(tokenFrom, tokenTo, bal);
     }
 
     function rewardsLength() external view returns (uint) {
@@ -160,8 +159,8 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         require(_token != lpToken, "!lpToken");
 
         rewards.push(_token);
-        _approve(_token, unirouter, 0);
-        _approve(_token, unirouter, type(uint).max);
+        _approve(_token, swapper, 0);
+        _approve(_token, swapper, type(uint).max);
     }
 
     function removeReward(uint i) external onlyManager {
@@ -171,23 +170,23 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
 
     function resetRewards() external onlyManager {
         for (uint i; i < rewards.length; ++i) {
-            _approve(rewards[i], unirouter, 0);
+            _approve(rewards[i], swapper, 0);
         }
         delete rewards;
     }
 
-    function updateUnirouter(address _unirouter) external onlyOwner {
+    function updateSwapper(address _swapper) external onlyOwner {
         for (uint i; i < rewards.length; ++i) {
             address token = rewards[i];
-            _approve(token, unirouter, 0);
-            _approve(token, _unirouter, 0);
-            _approve(token, _unirouter, type(uint).max);
+            _approve(token, swapper, 0);
+            _approve(token, _swapper, 0);
+            _approve(token, _swapper, type(uint).max);
         }
-        _approve(wnative, unirouter, 0);
-        _approve(wnative, _unirouter, 0);
-        _approve(wnative, _unirouter, type(uint).max);
-        unirouter = _unirouter;
-        emit SetUnirouter(_unirouter);
+        _approve(wnative, swapper, 0);
+        _approve(wnative, _swapper, 0);
+        _approve(wnative, _swapper, type(uint).max);
+        swapper = _swapper;
+        emit SetSwapper(_swapper);
     }
 
     function setRewardMinAmount(address token, uint minAmount) external onlyManager {
@@ -269,21 +268,21 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
     function _giveAllowances() internal {
         IERC20(want).safeApprove(stargateRouter, type(uint256).max);
         IERC20(lpToken).safeApprove(chef, type(uint256).max);
-        IERC20(wnative).safeApprove(unirouter, type(uint256).max);
+        IERC20(wnative).safeApprove(swapper, type(uint256).max);
 
         for (uint i; i < rewards.length; i++) {
-            IERC20(rewards[i]).safeApprove(unirouter, 0);
-            IERC20(rewards[i]).safeApprove(unirouter, type(uint256).max);
+            IERC20(rewards[i]).safeApprove(swapper, 0);
+            IERC20(rewards[i]).safeApprove(swapper, type(uint256).max);
         }
     }
 
     function _removeAllowances() internal {
         IERC20(want).safeApprove(stargateRouter, 0);
         IERC20(lpToken).safeApprove(chef, 0);
-        IERC20(wnative).safeApprove(unirouter, 0);
+        IERC20(wnative).safeApprove(swapper, 0);
 
         for (uint i; i < rewards.length; i++) {
-            IERC20(rewards[i]).safeApprove(unirouter, 0);
+            IERC20(rewards[i]).safeApprove(swapper, 0);
         }
     }
 

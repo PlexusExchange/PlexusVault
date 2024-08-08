@@ -94,19 +94,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         deposit(want().balanceOf(msg.sender));
     }
 
-    function previewDeposit(uint _amount) public  {
-        uint256 _pool =  want().balanceOf(address(this)) + IStrategy(strategy).balanceOf();
-        want().safeTransferFrom(msg.sender, address(this), _amount);
-        earn();
-        uint256 _after = want().balanceOf(address(this)) + IStrategy(strategy).balanceOf();
-          _amount = _after - _pool; 
-           uint256 shares = 0;
-        if (totalSupply() == 0) {
-            shares = _amount;
-        } else {
-            shares = (_amount * totalSupply()) / _pool;
-        }
-    }
+    
 
     /**
      * @dev The entrypoint of funds into the system. People deposit with this function
@@ -166,7 +154,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
             }
         }
         
-        emit Withdraw(msg.sender, r,0,0);
+        emit Withdraw(msg.sender, _shares, r,0);
         want().safeTransfer(msg.sender, r);
     }
 

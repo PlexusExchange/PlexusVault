@@ -136,7 +136,7 @@ describe("VaultTest", function () {
 
     const commonAddresses = {
       vault: testPlexusVaultERC20_address,
-      unirouter: simpleSwapper.target,
+      swapper: simpleSwapper.target,
       keeper: KEEPER,
       strategist: STRATEGIST,
       plexusFeeRecipient: STRATEGIST,
