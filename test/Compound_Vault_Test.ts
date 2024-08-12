@@ -39,6 +39,7 @@ describe("VaultTest", function () {
   const KEEPER = "0xb612cF824bFf640b5F3E408Eba5EAf2F46E1F09B";
   const STRATEGIST = "0x0Bb989a2593E7513B44ae408F1e3191E0183b20a";
   const ONEINCH = "0x111111125421cA6dc452d289314280a0f8842A65";
+  const COMET_REWARDS = "0x45939657d1CA34A8FA39A924B71D28Fe8431e581";
 
   before(async function () {
     const mainUserAddress = "0xb612cF824bFf640b5F3E408Eba5EAf2F46E1F09B";
@@ -127,7 +128,13 @@ describe("VaultTest", function () {
       plexusFeeConfig: plexusFeeConfigurator.target,
     };
 
-    await strategyCompoundV3.initialize(cToken, commonAddresses);
+    await strategyCompoundV3.initialize(
+      cToken,
+      WNATIVE,
+      COMP_ADDRESS,
+      COMET_REWARDS,
+      commonAddresses
+    );
 
     await testPlexusVaultERC20.initialize(
       strategyCompoundV3.target,
@@ -183,7 +190,6 @@ describe("VaultTest", function () {
         input4.toString(),
       ],
     ]);
-    console.log("Encoded Data:", encodedData);
 
     //data주소부분 simpleSwapper로 바꿔야함
     const swapInfo_oneinch_COMP_WMATIC = {
@@ -220,15 +226,8 @@ describe("VaultTest", function () {
     await usdce
       .connect(mainUser)
       .approve(testPlexusVaultERC20_address, depositAmount);
-    console.log("CHECK CONSOLE");
-
-    console.log(
-      "usdce ALLOWANCe",
-      await usdce.allowance(mainUser, testPlexusVaultERC20_address)
-    );
 
     await testPlexusVaultERC20.connect(mainUser).deposit(depositAmount);
-    console.log("CHECK CONSOLE");
   });
 
   //USDC -> swap -> USDCepool
@@ -247,34 +246,19 @@ describe("VaultTest", function () {
       5000000
     );
 
-    console.log(
-      "oneinch",
-      oneInchCallData.dstAmount,
-      oneInchCallData.tx.to,
-      oneInchCallData.tx.data
-    );
-
     const usdc = await ethers.getContractAt(IERC20_SOURCE, USDC_ADDRESS);
 
     const depositAmount = ethers.parseUnits("5", 6);
-    console.log("CHECK CONSOLE", depositAmount);
 
     await usdc
       .connect(mainUser)
       .approve(plexusTokenManager_address, depositAmount);
-    console.log("CHECK CONSOLE");
-
-    console.log(
-      await plexusZapRouter.tokenManager(),
-      plexusTokenManager_address
-    );
 
     console.log(
       "usdce ALLOWANCE",
       await usdc.allowance(mainUser, plexusTokenManager_address)
     );
 
-    console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
     const order = {
       inputs: [
         {

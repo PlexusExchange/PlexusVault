@@ -2,13 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
 import "../../interfaces/common/IERC20Extended.sol";
-import "../Common/StratFeeManagerInitializable.sol";
 import "../../interfaces/plexus/IPlexusSwapper.sol";
-
-import "../../utils/UniV3Actions.sol";
-import "../../utils/UniswapV3Utils.sol";
+import "../Common/StratFeeManagerInitializable.sol";
+import "hardhat/console.sol";
 
 interface IComet {
     function supply(address asset, uint amount) external;
@@ -25,20 +22,16 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
     using SafeERC20 for IERC20;
 
     // Tokens used
-    address public constant wnative = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
-    address public constant output = 0x8505b9d2254A7Ae468c0E9dd10Ccea3A837aef5c; // comp
+    address public wnative ;
+    address public output ;// comp
     address public want;
     address public cToken;
 
-    // Third party contracts
-    ICometRewards public constant rewards = ICometRewards(0x45939657d1CA34A8FA39A924B71D28Fe8431e581);
+    // Third party contracts // https://docs.compound.finance/#protocol-contracts
+    ICometRewards public  rewards ;
     bool public harvestOnDeposit;
     uint256 public lastHarvest;
     
-    bytes public outputToNativePath;
-    bytes public nativeToWantPath;
-    
-
     event StratHarvest(address indexed harvester, uint256 wantHarvested, uint256 tvl);
     event Deposit(uint256 tvl);
     event Withdraw(uint256 tvl);
@@ -46,10 +39,16 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
     function initialize(
         address _cToken,
+        address _wnative,
+        address _comp,
+        address _rewards,
         CommonAddresses calldata _commonAddresses
      ) public initializer  {
         __StratFeeManager_init(_commonAddresses);
         cToken = _cToken;
+        wnative = _wnative;
+        output = _comp;
+        rewards = ICometRewards(_rewards);
         want = IComet(cToken).baseToken();
         _giveAllowances();
     }
@@ -60,6 +59,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
         if (bal > 0) {
             IComet(cToken).supply(want, bal);
+            console.log("balanceOf()",balanceOf());
             emit Deposit(balanceOf());
         }
     }
@@ -83,11 +83,11 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         }
 
         if (tx.origin != owner() && !paused()) {
-            uint256 withdrawalFeeAmount = _amount * withdrawalFee / WITHDRAWAL_MAX;
-            _amount = _amount - withdrawalFeeAmount;
+            uint256 withdrawalFeeAmount = wantBal * withdrawalFee / WITHDRAWAL_MAX;
+            wantBal = wantBal - withdrawalFeeAmount;
         }
 
-        IERC20(want).safeTransfer(vault, _amount);
+        IERC20(want).safeTransfer(vault, wantBal);
 
         emit Withdraw(balanceOf());
     }
@@ -111,6 +111,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         rewards.claim(cToken, address(this), true);
         _swapRewardsToNative();
         uint256 wnativeBal = IERC20(wnative).balanceOf(address(this));
+        console.log("wnativeBal",wnativeBal);
         if (wnativeBal > 0) {
             _chargeFees();
             _swapToWant(wnative, want);
@@ -123,6 +124,8 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
     function _swapRewardsToNative() internal {
         uint bal = IERC20(output).balanceOf(address(this));
+            console.log("output",output);
+            console.log("bal",bal);
         if (bal > 0) {
             IPlexusSwapper(swapper).swap(output, wnative, bal);
 
@@ -172,7 +175,6 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
     function setHarvestOnDeposit(bool _harvestOnDeposit) external onlyManager {
         harvestOnDeposit = _harvestOnDeposit;
-
         if (harvestOnDeposit) {
             setWithdrawalFee(0);
         } else {
@@ -183,30 +185,25 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
     // called as part of strat migration. Sends all the available funds back to the vault.
     function retireStrat() external {
         require(msg.sender == vault, "!vault");
-
         IComet(cToken).withdraw(want, balanceOfPool());
-
         uint256 wantBal = IERC20(want).balanceOf(address(this));
         IERC20(want).transfer(vault, wantBal);
     }
 
     // pauses deposits and withdraws all funds from third party systems.
     function panic() public onlyManager {
-
         IComet(cToken).withdraw(want, balanceOfPool());
         pause();
     }
 
     function pause() public onlyManager {
         _pause();
-
         _removeAllowances();
     }
 
     function unpause() external onlyManager {
         _unpause();
         _giveAllowances();
-
         deposit();
     }
 

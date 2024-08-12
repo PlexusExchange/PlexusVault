@@ -1,7 +1,6 @@
 // test/vaultTest.ts
 
-import { ethers, waffle, network } from "hardhat";
-import { expect } from "chai";
+import { ethers, network } from "hardhat";
 import {
   PlexusVaultERC20,
   PlexusVaultFactory,
@@ -55,8 +54,6 @@ describe("VaultTest", function () {
     });
 
     mainUser = await ethers.getSigner(mainUserAddress);
-
-    console.log("mainUser", mainUser.address);
 
     const PlexusVaultERC20Factory = await ethers.getContractFactory(
       "PlexusVaultERC20"
@@ -183,17 +180,10 @@ describe("VaultTest", function () {
     const usdt = await ethers.getContractAt(IERC20_SOURCE, USDT_ADDRESS);
 
     const depositAmount = ethers.parseUnits("3", 6);
-    console.log("CHECK CONSOLE", depositAmount);
 
     await usdt
       .connect(mainUser)
       .approve(testPlexusVaultERC20_address, depositAmount);
-    console.log("CHECK CONSOLE");
-
-    console.log(
-      "usdt ALLOWANCe",
-      await usdt.allowance(mainUser, testPlexusVaultERC20_address)
-    );
 
     await testPlexusVaultERC20.connect(mainUser).deposit(depositAmount);
     console.log("CHECK CONSOLE");
@@ -215,13 +205,6 @@ describe("VaultTest", function () {
       5000000
     );
 
-    console.log(
-      "oneinch",
-      oneInchCallData.dstAmount,
-      oneInchCallData.tx.to,
-      oneInchCallData.tx.data
-    );
-
     const usdc = await ethers.getContractAt(IERC20_SOURCE, USDC_ADDRESS);
 
     const depositAmount = ethers.parseUnits("5", 6);
@@ -230,19 +213,7 @@ describe("VaultTest", function () {
     await usdc
       .connect(mainUser)
       .approve(plexusTokenManager_address, depositAmount);
-    console.log("CHECK CONSOLE");
 
-    console.log(
-      await plexusZapRouter.tokenManager(),
-      plexusTokenManager_address
-    );
-
-    console.log(
-      "usdc ALLOWANCE",
-      await usdc.allowance(mainUser, plexusTokenManager_address)
-    );
-
-    console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
     const order = {
       inputs: [
         {
@@ -293,19 +264,7 @@ describe("VaultTest", function () {
     await usdt
       .connect(mainUser)
       .approve(plexusTokenManager_address, depositAmount);
-    // console.log("CHECK CONSOLE");
 
-    // console.log(
-    //   await plexusZapRouter.tokenManager(),
-    //   plexusTokenManager_address
-    // );
-
-    // console.log(
-    //   "usdt ALLOWANCE",
-    //   await usdt.allowance(mainUser, plexusTokenManager_address)
-    // );
-
-    // console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
     const order = {
       inputs: [
         {

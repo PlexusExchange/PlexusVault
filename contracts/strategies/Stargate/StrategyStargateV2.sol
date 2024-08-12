@@ -9,6 +9,7 @@ import "../../interfaces/common/IWrappedNative.sol";
 import "../../interfaces/common/IERC20Extended.sol";
 import "../../interfaces/plexus/IPlexusSwapper.sol";
 import "../Common/StratFeeManagerInitializable.sol";
+import "hardhat/console.sol";
 
 contract StrategyStargateV2 is StratFeeManagerInitializable {
     using SafeERC20 for IERC20;
@@ -33,7 +34,6 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
     // Third party contracts
     address public chef;
     address public stargateRouter;
-    uint256 public convertRate;
 
     function initialize(
         address _chef,
@@ -48,7 +48,6 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         want = IStargateV2Router(stargateRouter).token();
         lpToken = IStargateV2Router(stargateRouter).lpToken();
         lpTokens.push(lpToken);
-        convertRate = 10 ** uint256(IERC20Extended(want).decimals() - IStargateV2Router(stargateRouter).sharedDecimals());
         wnative = _wnative;
         lockDuration = 1 days;
         for (uint i; i < _rewards.length; i++) {
@@ -62,12 +61,9 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
     function deposit() public whenNotPaused {
         uint256 wantBal = balanceOfWant();
         if (wantBal > 0) {
-            uint256 amount = (wantBal / convertRate) * convertRate;
-            if (amount > 0) {
-                IStargateV2Router(stargateRouter).deposit(address(this), amount);
-                IStargateV2Chef(chef).deposit(lpToken, amount);
+                IStargateV2Router(stargateRouter).deposit(address(this), wantBal);
+                IStargateV2Chef(chef).deposit(lpToken, wantBal);
                 emit Deposit(balanceOf());
-            }
         }
     }
 
@@ -77,7 +73,8 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         uint256 wantBal = balanceOfWant();
 
         if (wantBal < _amount) {
-            uint256 amount = ((_amount - wantBal) / convertRate) * convertRate;
+            uint256 amount = _amount - wantBal;
+            
             IStargateV2Chef(chef).withdraw(lpToken, amount);
             IStargateV2Router(stargateRouter).redeem(amount, address(this));
             wantBal = balanceOfWant();
@@ -113,6 +110,7 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         IStargateV2Chef(chef).claim(lpTokens);
         _swapRewardsToNative();
         uint256 wnativeBal = IERC20(wnative).balanceOf(address(this));
+        console.log("wnativeBal",wnativeBal);
         if (wnativeBal > 0) {
             _chargeFees();
             _swapToWant(wnative, want);
@@ -128,6 +126,8 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         for (uint i; i < rewards.length; ++i) {
             address token = rewards[i];
             uint256 amount = IERC20(token).balanceOf(address(this));
+            console.log("token",token);
+            console.log("amount",amount);
             if (amount > minAmounts[token]) {
                 IPlexusSwapper(swapper).swap(token, wnative, amount);
             }
@@ -214,15 +214,6 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         return IStargateV2Chef(chef).balanceOf(lpToken, address(this));
     }
 
-    function setHarvestOnDeposit(bool _harvestOnDeposit) public onlyManager {
-        harvestOnDeposit = _harvestOnDeposit;
-        if (harvestOnDeposit) {
-            lockDuration = 0;
-        } else {
-            lockDuration = 1 days;
-        }
-    }
-
     function setLockDuration(uint _duration) external onlyManager {
         lockDuration = _duration;
     }
@@ -235,6 +226,15 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         return 0;
     }
 
+    function setHarvestOnDeposit(bool _harvestOnDeposit) public onlyManager {
+        harvestOnDeposit = _harvestOnDeposit;
+        if (harvestOnDeposit) {
+            lockDuration = 0;
+        } else {
+            lockDuration = 1 days;
+        }
+    }
+
     // called as part of strat migration. Sends all the available funds back to the vault.
     function retireStrat() external {
         require(msg.sender == vault, "!vault");
@@ -245,9 +245,9 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
 
     // pauses deposits and withdraws all funds from third party systems.
     function panic() public onlyManager {
-        pause();
         IStargateV2Chef(chef).emergencyWithdraw(lpToken);
         IStargateV2Router(stargateRouter).redeem(IERC20(lpToken).balanceOf(address(this)), address(this));
+        pause();
     }
 
     function pause() public onlyManager {
