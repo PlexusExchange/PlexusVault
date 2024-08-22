@@ -1552,12 +1552,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+
 "@uniswap/v2-core@npm:^1.0.1":
   version: 1.0.1
   resolution: "@uniswap/v2-core@npm:1.0.1"
   checksum: 10c0/61fc8beb5f2875fc3fe6b00043c9491f0eb9839b824af44d53a303f3df1970c6c3e8a555b7a0150e0ad75b8e49ad6e3cf7d923109da31884536a7a844c24cda0
   languageName: node
   linkType: hard
+
 
 "@uniswap/v2-periphery@npm:^1.1.0-beta.0":
   version: 1.1.0-beta.0
