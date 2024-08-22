@@ -51,12 +51,18 @@ contract StrategyFactory is Ownable {
 
     /// @notice Throws if called by any account other than the owner or the keeper/
     modifier onlyManager() {
-        if (msg.sender != owner() && msg.sender != address(keeper)) revert NotManager();
+        if (msg.sender != owner() && msg.sender != address(keeper))
+            revert NotManager();
         _;
     }
 
     /// @notice Constructor initializes the keeper address
-    constructor(address _wnative, address _keeper, address _plexusFeeRecipient, address _plexusFeeConfig) Ownable() {
+    constructor(
+        address _wnative,
+        address _keeper,
+        address _plexusFeeRecipient,
+        address _plexusFeeConfig
+    ) Ownable() {
         wnative = _wnative;
         keeper = _keeper;
         plexusFeeRecipient = _plexusFeeRecipient;
@@ -67,7 +73,9 @@ contract StrategyFactory is Ownable {
      * @param _strategyName The name of the strategy
      * @return A reference to the new proxied Plexus Strategy
      */
-    function createStrategy(string calldata _strategyName) external returns (address) {
+    function createStrategy(
+        string calldata _strategyName
+    ) external returns (address) {
         // Create a new Plexus Strategy as a proxy of the template instance
         UpgradeableBeacon instance = instances[_strategyName];
         BeaconProxy proxy = new BeaconProxy(address(instance), "");
@@ -82,7 +90,10 @@ contract StrategyFactory is Ownable {
      * @param _strategyName The name of the strategy
      * @param _newImplementation The new implementation address
      */
-    function upgradeTo(string calldata _strategyName, address _newImplementation) external onlyOwner {
+    function upgradeTo(
+        string calldata _strategyName,
+        address _newImplementation
+    ) external onlyOwner {
         UpgradeableBeacon instance = instances[_strategyName];
         instance.upgradeTo(_newImplementation);
         emit InstanceUpgraded(_strategyName, _newImplementation);
@@ -93,8 +104,12 @@ contract StrategyFactory is Ownable {
      * @param _strategyName The name of the strategy
      * @param _implementation The implementation address
      */
-    function addStrategy(string calldata _strategyName, address _implementation) external onlyManager {
-        if (address(instances[_strategyName]) != address(0)) revert StratVersionExists();
+    function addStrategy(
+        string calldata _strategyName,
+        address _implementation
+    ) external onlyManager {
+        if (address(instances[_strategyName]) != address(0))
+            revert StratVersionExists();
         instances[_strategyName] = new UpgradeableBeacon(_implementation);
 
         // Store in our deployed strategy type array
@@ -150,7 +165,9 @@ contract StrategyFactory is Ownable {
      * @notice set the plexus fee recipient address
      * @param _plexusFeeRecipient The new plexus fee recipient address
      */
-    function setPlexusFeeRecipient(address _plexusFeeRecipient) external onlyOwner {
+    function setPlexusFeeRecipient(
+        address _plexusFeeRecipient
+    ) external onlyOwner {
         plexusFeeRecipient = _plexusFeeRecipient;
         emit SetPlexusFeeRecipient(_plexusFeeRecipient);
     }
@@ -178,7 +195,9 @@ contract StrategyFactory is Ownable {
      * @param _strategyName The name of the strategy
      * @return The implementation address
      */
-    function getImplementation(string calldata _strategyName) external view returns (address) {
+    function getImplementation(
+        string calldata _strategyName
+    ) external view returns (address) {
         return instances[_strategyName].implementation();
     }
 

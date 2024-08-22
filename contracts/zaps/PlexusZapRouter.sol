@@ -17,7 +17,13 @@ import {ZapErrors} from "../infra/ZapErrors.sol";
  * @title Zap router for Plexus vaults
  * @notice Adaptable router for zapping tokens to and from Plexus vaults
  */
-contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, ReentrancyGuard {
+contract PlexusZapRouter is
+    IPlexusZapRouter,
+    ZapErrors,
+    Ownable,
+    Pausable,
+    ReentrancyGuard
+{
     using SafeERC20 for IERC20;
     using BytesLib for bytes;
 
@@ -45,7 +51,11 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param caller Address of the order's executor
      * @param recipient Address of the order's recipient
      */
-    event FulfilledOrder(Order indexed order, address indexed caller, address indexed recipient);
+    event FulfilledOrder(
+        Order indexed order,
+        address indexed caller,
+        address indexed recipient
+    );
 
     constructor() {
         tokenManager = address(new PlexusTokenManager());
@@ -58,9 +68,16 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param _order Order containing how many tokens to pull and the slippage amounts on outputs
      * @param _route Route containing the steps to reach the output
      */
-    function executeOrder(Order calldata _order, Step[] calldata _route) external payable nonReentrant whenNotPaused {
-        if (msg.sender != _order.user) revert InvalidCaller(_order.user, msg.sender);
-        IPlexusTokenManager(tokenManager).pullTokens(_order.user, _order.inputs);
+    function executeOrder(
+        Order calldata _order,
+        Step[] calldata _route
+    ) external payable nonReentrant whenNotPaused {
+        if (msg.sender != _order.user)
+            revert InvalidCaller(_order.user, msg.sender);
+        IPlexusTokenManager(tokenManager).pullTokens(
+            _order.user,
+            _order.inputs
+        );
         _executeOrder(_order, _route);
     }
 
@@ -71,7 +88,10 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param _order Order struct with details of inputs and outputs
      * @param _route Actual steps to transform inputs to outputs
      */
-    function _executeOrder(Order calldata _order, Step[] calldata _route) private {
+    function _executeOrder(
+        Order calldata _order,
+        Step[] calldata _route
+    ) private {
         _executeSteps(_route);
         _returnAssets(_order.outputs, _order.recipient, _order.relay.value);
         _executeRelay(_order.relay);
@@ -89,14 +109,15 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
         for (uint256 i; i < routeLength; ) {
             Step calldata step = _route[i];
 
-            (address stepTarget, uint256 value, bytes memory callData, StepToken[] calldata stepTokens) = (
-                step.target,
-                step.value,
-                step.data,
-                step.tokens
-            );
+            (
+                address stepTarget,
+                uint256 value,
+                bytes memory callData,
+                StepToken[] calldata stepTokens
+            ) = (step.target, step.value, step.data, step.tokens);
 
-            if (stepTarget == tokenManager) revert TargetingInvalidContract(stepTarget);
+            if (stepTarget == tokenManager)
+                revert TargetingInvalidContract(stepTarget);
 
             uint256 balance;
             uint256 callDataLength = callData.length;
@@ -104,17 +125,26 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
 
             for (uint256 j; j < stepTokensLength; ) {
                 StepToken calldata stepToken = stepTokens[j];
-                (address stepTokenAddress, int32 stepTokenIndex) = (stepToken.token, stepToken.index);
+                (address stepTokenAddress, int32 stepTokenIndex) = (
+                    stepToken.token,
+                    stepToken.index
+                );
 
                 if (stepTokenAddress == address(0)) {
                     value = address(this).balance;
-
                 } else {
                     balance = IERC20(stepTokenAddress).balanceOf(address(this));
                     _approveToken(stepTokenAddress, stepTarget, balance);
                     if (stepTokenIndex >= 0) {
                         uint256 idx = uint256(int256(stepTokenIndex));
-                        callData = bytes.concat(callData.slice(0, idx), abi.encode(balance), callData.slice(idx + 32, callDataLength - (idx + 32)));
+                        callData = bytes.concat(
+                            callData.slice(0, idx),
+                            abi.encode(balance),
+                            callData.slice(
+                                idx + 32,
+                                callDataLength - (idx + 32)
+                            )
+                        );
                     }
                 }
 
@@ -122,7 +152,9 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
                     ++j;
                 }
             }
-            (bool success, bytes memory result) = stepTarget.call{value: value}(callData);
+            (bool success, bytes memory result) = stepTarget.call{value: value}(
+                callData
+            );
             if (!success) _propagateError(stepTarget, value, callData, result);
 
             unchecked {
@@ -137,7 +169,11 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param _spender Address of spender that will be allowed to move tokens
      * @param _amount Number of tokens that are going to be spent
      */
-    function _approveToken(address _token, address _spender, uint256 _amount) private {
+    function _approveToken(
+        address _token,
+        address _spender,
+        uint256 _amount
+    ) private {
         if (IERC20(_token).allowance(address(this), _spender) < _amount) {
             IERC20(_token).forceApprove(_spender, type(uint256).max);
         }
@@ -150,8 +186,14 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param _data Payload data of the call
      * @param _returnedData Returned data from the call
      */
-    function _propagateError(address _target, uint256 _value, bytes memory _data, bytes memory _returnedData) private pure {
-        if (_returnedData.length == 0) revert CallFailed(_target, _value, _data);
+    function _propagateError(
+        address _target,
+        uint256 _value,
+        bytes memory _data,
+        bytes memory _returnedData
+    ) private pure {
+        if (_returnedData.length == 0)
+            revert CallFailed(_target, _value, _data);
         assembly {
             revert(add(32, _returnedData), mload(_returnedData))
         }
@@ -163,12 +205,19 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param _recipient Address of the receiver of the outputs
      * @param _relayValue Unwrapped wnative amount that is reserved for calling the relay address
      */
-    function _returnAssets(Output[] calldata _outputs, address _recipient, uint256 _relayValue) private {
+    function _returnAssets(
+        Output[] calldata _outputs,
+        address _recipient,
+        uint256 _relayValue
+    ) private {
         uint256 balance;
         uint256 outputsLength = _outputs.length;
         for (uint256 i; i < outputsLength; ) {
             Output calldata output = _outputs[i];
-            (address outputToken, uint256 outputMinAmount) = (output.token, output.minOutputAmount);
+            (address outputToken, uint256 outputMinAmount) = (
+                output.token,
+                output.minOutputAmount
+            );
             if (outputToken == address(0)) {
                 balance = address(this).balance;
                 if (balance < outputMinAmount) {
@@ -202,18 +251,28 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
      * @param _relay Target address and payload data in a struct
      */
     function _executeRelay(Relay calldata _relay) private {
-        (address relayTarget, uint256 relayValue, bytes calldata relaydata) = (_relay.target, _relay.value, _relay.data);
+        (address relayTarget, uint256 relayValue, bytes calldata relaydata) = (
+            _relay.target,
+            _relay.value,
+            _relay.data
+        );
         if (relayTarget != address(0)) {
             if (relayTarget == tokenManager) {
                 revert TargetingInvalidContract(relayTarget);
             }
 
             if (address(this).balance < relayValue) {
-                revert InsufficientRelayValue(address(this).balance, relayValue);
+                revert InsufficientRelayValue(
+                    address(this).balance,
+                    relayValue
+                );
             }
 
-            (bool success, bytes memory result) = relayTarget.call{value: relayValue}(relaydata);
-            if (!success) _propagateError(relayTarget, relayValue, relaydata, result);
+            (bool success, bytes memory result) = relayTarget.call{
+                value: relayValue
+            }(relaydata);
+            if (!success)
+                _propagateError(relayTarget, relayValue, relaydata, result);
 
             emit RelayData(relayTarget, relayValue, relaydata);
         }

@@ -6,7 +6,10 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "../../interfaces/common/IFeeConfig.sol";
 
-contract StratFeeManagerInitializable is OwnableUpgradeable, PausableUpgradeable {
+contract StratFeeManagerInitializable is
+    OwnableUpgradeable,
+    PausableUpgradeable
+{
     struct CommonAddresses {
         address vault;
         address unirouter;
@@ -38,7 +41,9 @@ contract StratFeeManagerInitializable is OwnableUpgradeable, PausableUpgradeable
     event SetPlexusFeeRecipient(address plexusFeeRecipient);
     event SetPlexusFeeConfig(address plexusFeeConfig);
 
-    function __StratFeeManager_init(CommonAddresses calldata _commonAddresses) internal onlyInitializing {
+    function __StratFeeManager_init(
+        CommonAddresses calldata _commonAddresses
+    ) internal onlyInitializing {
         __Ownable_init();
         __Pausable_init();
         vault = _commonAddresses.vault;
@@ -112,7 +117,9 @@ contract StratFeeManagerInitializable is OwnableUpgradeable, PausableUpgradeable
     }
 
     // set new plexus fee address to receive plexus fees
-    function setPlexusFeeRecipient(address _plexusFeeRecipient) external onlyOwner {
+    function setPlexusFeeRecipient(
+        address _plexusFeeRecipient
+    ) external onlyOwner {
         plexusFeeRecipient = _plexusFeeRecipient;
         emit SetPlexusFeeRecipient(_plexusFeeRecipient);
     }

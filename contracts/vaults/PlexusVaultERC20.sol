@@ -8,14 +8,19 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../utils/Pausable.sol";
 import "../interfaces/plexus/IStrategy.sol";
-import "../interfaces/plexus/IBeefyVaultV7.sol";
+import "../interfaces/plexus/IPlexusVaultV7.sol";
 
 /**
  * @dev Implementation of a vault to deposit funds for yield optimizing.
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable,Pausable {
+contract PlexusVaultERC20 is
+    ERC20Upgradeable,
+    OwnableUpgradeable,
+    ReentrancyGuardUpgradeable,
+    Pausable
+{
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     struct StratCandidate {
@@ -32,10 +37,20 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
 
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);
-    event Deposit(address indexed user, uint256 shares, uint256 amount0, uint256 amount1, uint256 fee0, uint256 fee1);
-    event Withdraw(address indexed user, uint256 shares, uint256 amount0, uint256 amount1);
-
-
+    event Deposit(
+        address indexed user,
+        uint256 shares,
+        uint256 amount0,
+        uint256 amount1,
+        uint256 fee0,
+        uint256 fee1
+    );
+    event Withdraw(
+        address indexed user,
+        uint256 shares,
+        uint256 amount0,
+        uint256 amount1
+    );
 
     /**
      * @dev Sets the value of {token} to the token that the vault will
@@ -47,14 +62,18 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
      * @param _symbol the symbol of the vault token.
      * @param _approvalDelay the delay before a new strat can be approved.
      */
-    function initialize(address _strategy, string memory _name, string memory _symbol, uint256 _approvalDelay) public initializer {
+    function initialize(
+        address _strategy,
+        string memory _name,
+        string memory _symbol,
+        uint256 _approvalDelay
+    ) public initializer {
         __ERC20_init(_name, _symbol);
         __Ownable_init();
         __ReentrancyGuard_init();
         strategy = IStrategy(_strategy);
         approvalDelay = _approvalDelay;
     }
-
 
     function want() public view returns (IERC20Upgradeable) {
         return IERC20Upgradeable(strategy.want());
@@ -66,7 +85,8 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
      *  and the balance deployed in other contracts as part of the strategy.
      */
     function balance() public view returns (uint) {
-        return want().balanceOf(address(this)) + IStrategy(strategy).balanceOf();
+        return
+            want().balanceOf(address(this)) + IStrategy(strategy).balanceOf();
     }
 
     /**
@@ -111,7 +131,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         } else {
             shares = (_amount * totalSupply()) / _pool;
         }
-        emit Deposit( msg.sender,  shares,  uint256(_amount),0, 0,0);
+        emit Deposit(msg.sender, shares, uint256(_amount), 0, 0, 0);
         _mint(msg.sender, shares);
     }
 
@@ -150,8 +170,8 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
                 r = b + _diff;
             }
         }
-        
-        emit Withdraw(msg.sender, r,0,0);
+
+        emit Withdraw(msg.sender, r, 0, 0);
         want().safeTransfer(msg.sender, r);
     }
 
@@ -160,9 +180,15 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
      * @param _implementation The address of the candidate strategy.
      */
     function proposeStrat(address _implementation) public onlyOwner {
-        require(address(this) == IStrategy(_implementation).vault(), "Proposal not valid for this Vault");
+        require(
+            address(this) == IStrategy(_implementation).vault(),
+            "Proposal not valid for this Vault"
+        );
         require(want() == IStrategy(_implementation).want(), "Different want");
-        stratCandidate = StratCandidate({implementation: _implementation, proposedTime: block.timestamp});
+        stratCandidate = StratCandidate({
+            implementation: _implementation,
+            proposedTime: block.timestamp
+        });
 
         emit NewStratCandidate(_implementation);
     }
@@ -174,8 +200,14 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
      */
 
     function upgradeStrat() public onlyOwner {
-        require(stratCandidate.implementation != address(0), "There is no candidate");
-        require(stratCandidate.proposedTime + approvalDelay < block.timestamp, "Delay has not passed");
+        require(
+            stratCandidate.implementation != address(0),
+            "There is no candidate"
+        );
+        require(
+            stratCandidate.proposedTime + approvalDelay < block.timestamp,
+            "Delay has not passed"
+        );
 
         emit UpgradeStrat(stratCandidate.implementation);
 

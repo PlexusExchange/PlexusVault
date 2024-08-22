@@ -32,7 +32,10 @@ contract PlexusTokenManager is ZapErrors {
      * @param _user Address to pull tokens from
      * @param _inputs Token addresses and amounts to pull
      */
-    function pullTokens(address _user, IPlexusZapRouter.Input[] calldata _inputs) external {
+    function pullTokens(
+        address _user,
+        IPlexusZapRouter.Input[] calldata _inputs
+    ) external {
         if (msg.sender != zap) revert CallerNotZap(msg.sender);
         uint256 inputLength = _inputs.length;
         for (uint256 i; i < inputLength; ) {
@@ -41,7 +44,11 @@ contract PlexusTokenManager is ZapErrors {
                 ++i;
             }
             if (input.token == address(0)) continue;
-            IERC20(input.token).safeTransferFrom(_user, msg.sender, input.amount);
+            IERC20(input.token).safeTransferFrom(
+                _user,
+                msg.sender,
+                input.amount
+            );
         }
     }
 }
