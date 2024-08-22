@@ -12,7 +12,7 @@ contract StratFeeManagerInitializable is
 {
     struct CommonAddresses {
         address vault;
-        address unirouter;
+        address swapper;
         address keeper;
         address strategist;
         address plexusFeeRecipient;
@@ -21,7 +21,7 @@ contract StratFeeManagerInitializable is
 
     // common addresses for the strategy
     address public vault;
-    address public unirouter;
+    address public swapper;
     address public keeper;
     address public strategist;
     address public plexusFeeRecipient;
@@ -35,7 +35,7 @@ contract StratFeeManagerInitializable is
     event SetStratFeeId(uint256 feeId);
     event SetWithdrawalFee(uint256 withdrawalFee);
     event SetVault(address vault);
-    event SetUnirouter(address unirouter);
+    event SetSwapper(address swapper);
     event SetKeeper(address keeper);
     event SetStrategist(address strategist);
     event SetPlexusFeeRecipient(address plexusFeeRecipient);
@@ -47,7 +47,7 @@ contract StratFeeManagerInitializable is
         __Ownable_init();
         __Pausable_init();
         vault = _commonAddresses.vault;
-        unirouter = _commonAddresses.unirouter;
+        swapper = _commonAddresses.swapper;
         keeper = _commonAddresses.keeper;
         strategist = _commonAddresses.strategist;
         plexusFeeRecipient = _commonAddresses.plexusFeeRecipient;
@@ -97,10 +97,10 @@ contract StratFeeManagerInitializable is
         emit SetVault(_vault);
     }
 
-    // set new unirouter
-    function setUnirouter(address _unirouter) external onlyOwner {
-        unirouter = _unirouter;
-        emit SetUnirouter(_unirouter);
+    // set new swapper
+    function setSwapper(address _swapper) external onlyOwner {
+        swapper = _swapper;
+        emit SetSwapper(_swapper);
     }
 
     // set new keeper to manage strat

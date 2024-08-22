@@ -125,7 +125,7 @@ contract StrategySilo is StratFeeManagerInitializable {
     function _swapRewardsToNative() internal {
         uint bal = IERC20(output).balanceOf(address(this));
         if (bal > 0) {
-            IPlexusSwapper(unirouter).swap(output, wnative, bal);
+            IPlexusSwapper(swapper).swap(output, wnative, bal);
         }
     }
 
@@ -144,7 +144,7 @@ contract StrategySilo is StratFeeManagerInitializable {
     function _swapToWant() internal {
         uint256 bal = IERC20(wnative).balanceOf(address(this));
         if (want != wnative) {
-            IPlexusSwapper(unirouter).swap(wnative, want, bal);
+            IPlexusSwapper(swapper).swap(wnative, want, bal);
         }
     }
 
@@ -219,14 +219,14 @@ contract StrategySilo is StratFeeManagerInitializable {
     }
 
     function _giveAllowances() internal {
-        IERC20(output).approve(unirouter, type(uint).max);
-        IERC20(wnative).approve(unirouter, type(uint).max);
+        IERC20(output).approve(swapper, type(uint).max);
+        IERC20(wnative).approve(swapper, type(uint).max);
         IERC20(want).approve(silo, type(uint).max);
     }
 
     function _removeAllowances() internal {
-        IERC20(output).approve(unirouter, 0);
-        IERC20(wnative).approve(unirouter, 0);
+        IERC20(output).approve(swapper, 0);
+        IERC20(wnative).approve(swapper, 0);
         IERC20(want).approve(silo, 0);
     }
 }

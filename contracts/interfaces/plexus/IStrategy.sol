@@ -19,5 +19,5 @@ interface IStrategy {
     function pause() external;
     function unpause() external;
     function paused() external view returns (bool);
-    function unirouter() external view returns (address);
+    function swapper() external view returns (address);
 }
