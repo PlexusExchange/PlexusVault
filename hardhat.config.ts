@@ -3,7 +3,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-const networkName = "hardhat";
+const networkName = "ARBI";
 
 const config: HardhatUserConfig = {
   defaultNetwork: networkName,
@@ -14,7 +14,7 @@ const config: HardhatUserConfig = {
       gasPrice: 150000000000, // 100000000 => 0.1gwei 50000000000 => 50gwei
 
       forking: {
-        url: process.env.MAIN_POLYGON_URL as string,
+        url: process.env.MAIN_ARBI_URL as string,
       },
     },
     ETH: {
@@ -33,7 +33,7 @@ const config: HardhatUserConfig = {
     },
     ARBI: {
       url: process.env.MAIN_ARBI_URL,
-      accounts: [process.env.MAIN_PKEY as string],
+      accounts: [process.env.DEV_PKEY as string],
     },
     FANTOM: {
       url: process.env.MAIN_FANTOM_URL,
@@ -108,6 +108,15 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.24",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
+      {
+        version: "0.8.23",
         settings: {
           optimizer: {
             enabled: true,

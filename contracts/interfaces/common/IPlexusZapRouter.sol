@@ -87,7 +87,10 @@ interface IPlexusZapRouter {
      * @param _order Order created by the user
      * @param _route Route supplied by user
      */
-    function executeOrder(Order calldata _order, Step[] calldata _route) external payable;
+    function executeOrder(
+        Order calldata _order,
+        Step[] calldata _route
+    ) external payable;
 
     /**
      * @notice Pause the contract from carrying out any more zaps

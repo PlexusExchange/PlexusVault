@@ -35,18 +35,40 @@ contract SimpleSwapper {
     error NoSwapData(address fromToken, address toToken);
     error SwapFailed(address router, bytes data);
 
-    event Swap(address indexed caller, address indexed fromToken, address indexed toToken, uint256 amountIn, uint256 amountOut);
-    event SetSwapInfo(address indexed fromToken, address indexed toToken, SwapInfo swapInfo);
+    event Swap(
+        address indexed caller,
+        address indexed fromToken,
+        address indexed toToken,
+        uint256 amountIn,
+        uint256 amountOut
+    );
+    event SetSwapInfo(
+        address indexed fromToken,
+        address indexed toToken,
+        SwapInfo swapInfo
+    );
 
-    function swap(address _fromToken, address _toToken, uint256 _amountIn) external returns (uint256 amountOut) {
-        IERC20(_fromToken).safeTransferFrom(msg.sender, address(this), _amountIn);
+    function swap(
+        address _fromToken,
+        address _toToken,
+        uint256 _amountIn
+    ) external returns (uint256 amountOut) {
+        IERC20(_fromToken).safeTransferFrom(
+            msg.sender,
+            address(this),
+            _amountIn
+        );
         _executeSwap(_fromToken, _toToken, _amountIn);
         amountOut = IERC20(_toToken).balanceOf(address(this));
         IERC20(_toToken).safeTransfer(msg.sender, amountOut);
         emit Swap(msg.sender, _fromToken, _toToken, _amountIn, amountOut);
     }
 
-    function _executeSwap(address _fromToken, address _toToken, uint256 _amountIn) private {
+    function _executeSwap(
+        address _fromToken,
+        address _toToken,
+        uint256 _amountIn
+    ) private {
         SwapInfo memory swapData = swapInfo[_fromToken][_toToken];
         address router = swapData.router;
         if (router == address(0)) revert NoSwapData(_fromToken, _toToken);
@@ -57,16 +79,31 @@ contract SimpleSwapper {
         if (!success) revert SwapFailed(router, data);
     }
 
-    function _insertData(bytes memory _data, uint256 _index, bytes memory _newData) private pure returns (bytes memory data) {
-        data = bytes.concat(bytes.concat(_data.slice(0, _index), _newData), _data.slice(_index + 32, _data.length - (_index + 32)));
+    function _insertData(
+        bytes memory _data,
+        uint256 _index,
+        bytes memory _newData
+    ) private pure returns (bytes memory data) {
+        data = bytes.concat(
+            bytes.concat(_data.slice(0, _index), _newData),
+            _data.slice(_index + 32, _data.length - (_index + 32))
+        );
     }
 
-    function setSwapInfo(address _fromToken, address _toToken, SwapInfo calldata _swapInfo) external onlyManager {
+    function setSwapInfo(
+        address _fromToken,
+        address _toToken,
+        SwapInfo calldata _swapInfo
+    ) external onlyManager {
         swapInfo[_fromToken][_toToken] = _swapInfo;
         emit SetSwapInfo(_fromToken, _toToken, _swapInfo);
     }
 
-    function setSwapInfos(address[] calldata _fromTokens, address[] calldata _toTokens, SwapInfo[] calldata _swapInfos) external onlyManager {
+    function setSwapInfos(
+        address[] calldata _fromTokens,
+        address[] calldata _toTokens,
+        SwapInfo[] calldata _swapInfos
+    ) external onlyManager {
         uint256 tokenLength = _fromTokens.length;
         for (uint i; i < tokenLength; ) {
             swapInfo[_fromTokens[i]][_toTokens[i]] = _swapInfos[i];
@@ -83,13 +120,25 @@ contract SimpleSwapper {
         }
     }
 
-    function fromNative(address _token) external view returns (address router, bytes memory data, uint256 amountIndex) {
+    function fromNative(
+        address _token
+    )
+        external
+        view
+        returns (address router, bytes memory data, uint256 amountIndex)
+    {
         router = swapInfo[wwnative][_token].router;
         data = swapInfo[wwnative][_token].data;
         amountIndex = swapInfo[wwnative][_token].amountIndex;
     }
 
-    function toNative(address _token) external view returns (address router, bytes memory data, uint256 amountIndex) {
+    function toNative(
+        address _token
+    )
+        external
+        view
+        returns (address router, bytes memory data, uint256 amountIndex)
+    {
         router = swapInfo[_token][wwnative].router;
         data = swapInfo[_token][wwnative].data;
         amountIndex = swapInfo[_token][wwnative].amountIndex;

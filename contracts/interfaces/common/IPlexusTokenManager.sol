@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.19;
 
-import { IPlexusZapRouter } from "./IPlexusZapRouter.sol";
+import {IPlexusZapRouter} from "./IPlexusZapRouter.sol";
 
 /**
  * @title Token manager interface
@@ -14,5 +14,8 @@ interface IPlexusTokenManager {
      * @param _user Address of user to transfer tokens from
      * @param _inputs Addresses and amounts of tokens to transfer
      */
-    function pullTokens(address _user, IPlexusZapRouter.Input[] calldata _inputs) external;
+    function pullTokens(
+        address _user,
+        IPlexusZapRouter.Input[] calldata _inputs
+    ) external;
 }
