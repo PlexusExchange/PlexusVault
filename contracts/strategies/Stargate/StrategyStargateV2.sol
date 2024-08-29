@@ -9,6 +9,7 @@ import "../../interfaces/common/IWrappedNative.sol";
 import "../../interfaces/common/IERC20Extended.sol";
 import "../../interfaces/plexus/IPlexusSwapper.sol";
 import "../Common/StratFeeManagerInitializable.sol";
+import "hardhat/console.sol";
 
 contract StrategyStargateV2 is StratFeeManagerInitializable {
     using SafeERC20 for IERC20;
@@ -133,8 +134,6 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
             }
         }
     }
-
-
     // performance fees
     function _chargeFees() internal {
         IFeeConfig.FeeCategory memory fees = getFees();

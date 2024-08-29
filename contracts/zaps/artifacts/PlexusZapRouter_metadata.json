@@ -1,0 +1,729 @@
+{
+	"compiler": {
+		"version": "0.8.19+commit.7dd6d404"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "target",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes",
+						"name": "callData",
+						"type": "bytes"
+					}
+				],
+				"name": "CallFailed",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "caller",
+						"type": "address"
+					}
+				],
+				"name": "CallerNotZap",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					}
+				],
+				"name": "EtherTransferFailed",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "balance",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "relayValue",
+						"type": "uint256"
+					}
+				],
+				"name": "InsufficientRelayValue",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "caller",
+						"type": "address"
+					}
+				],
+				"name": "InvalidCaller",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "minAmountOut",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "balance",
+						"type": "uint256"
+					}
+				],
+				"name": "Slippage",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "target",
+						"type": "address"
+					}
+				],
+				"name": "TargetingInvalidContract",
+				"type": "error"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "token",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "amount",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.Input[]",
+								"name": "inputs",
+								"type": "tuple[]"
+							},
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "token",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "minOutputAmount",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.Output[]",
+								"name": "outputs",
+								"type": "tuple[]"
+							},
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "target",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "value",
+										"type": "uint256"
+									},
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.Relay",
+								"name": "relay",
+								"type": "tuple"
+							},
+							{
+								"internalType": "address",
+								"name": "user",
+								"type": "address"
+							},
+							{
+								"internalType": "address",
+								"name": "recipient",
+								"type": "address"
+							}
+						],
+						"indexed": true,
+						"internalType": "struct IPlexusZapRouter.Order",
+						"name": "order",
+						"type": "tuple"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "caller",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "recipient",
+						"type": "address"
+					}
+				],
+				"name": "FulfilledOrder",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "Paused",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "target",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "data",
+						"type": "bytes"
+					}
+				],
+				"name": "RelayData",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "token",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "TokenReturned",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "Unpaused",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "token",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "amount",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.Input[]",
+								"name": "inputs",
+								"type": "tuple[]"
+							},
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "token",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "minOutputAmount",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.Output[]",
+								"name": "outputs",
+								"type": "tuple[]"
+							},
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "target",
+										"type": "address"
+									},
+									{
+										"internalType": "uint256",
+										"name": "value",
+										"type": "uint256"
+									},
+									{
+										"internalType": "bytes",
+										"name": "data",
+										"type": "bytes"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.Relay",
+								"name": "relay",
+								"type": "tuple"
+							},
+							{
+								"internalType": "address",
+								"name": "user",
+								"type": "address"
+							},
+							{
+								"internalType": "address",
+								"name": "recipient",
+								"type": "address"
+							}
+						],
+						"internalType": "struct IPlexusZapRouter.Order",
+						"name": "_order",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "address",
+								"name": "target",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "value",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bytes",
+								"name": "data",
+								"type": "bytes"
+							},
+							{
+								"components": [
+									{
+										"internalType": "address",
+										"name": "token",
+										"type": "address"
+									},
+									{
+										"internalType": "int32",
+										"name": "index",
+										"type": "int32"
+									}
+								],
+								"internalType": "struct IPlexusZapRouter.StepToken[]",
+								"name": "tokens",
+								"type": "tuple[]"
+							}
+						],
+						"internalType": "struct IPlexusZapRouter.Step[]",
+						"name": "_route",
+						"type": "tuple[]"
+					}
+				],
+				"name": "executeOrder",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "pause",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "paused",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "tokenManager",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "unpause",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
+			}
+		],
+		"devdoc": {
+			"events": {
+				"FulfilledOrder(((address,uint256)[],(address,uint256)[],(address,uint256,bytes),address,address),address,address)": {
+					"params": {
+						"caller": "Address of the order's executor",
+						"order": "Order that has been fulfilled",
+						"recipient": "Address of the order's recipient"
+					}
+				},
+				"Paused(address)": {
+					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"RelayData(address,uint256,bytes)": {
+					"params": {
+						"data": "Payload of the external call",
+						"target": "Address of the target",
+						"value": "Ether value of the call"
+					}
+				},
+				"TokenReturned(address,uint256)": {
+					"params": {
+						"amount": "Amount of the token sent to the recipient",
+						"token": "Address of the token sent to recipient"
+					}
+				},
+				"Unpaused(address)": {
+					"details": "Emitted when the pause is lifted by `account`."
+				}
+			},
+			"kind": "dev",
+			"methods": {
+				"executeOrder(((address,uint256)[],(address,uint256)[],(address,uint256,bytes),address,address),(address,uint256,bytes,(address,int32)[])[])": {
+					"details": "The user executes their own order directly. User must have already approved the token manager to move the tokens",
+					"params": {
+						"_order": "Order containing how many tokens to pull and the slippage amounts on outputs",
+						"_route": "Route containing the steps to reach the output"
+					}
+				},
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"pause()": {
+					"details": "Only owner can pause"
+				},
+				"paused()": {
+					"details": "Returns true if the contract is paused, and false otherwise."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				},
+				"unpause()": {
+					"details": "Only owner can unpause"
+				}
+			},
+			"title": "Zap router for Plexus vaults",
+			"version": 1
+		},
+		"userdoc": {
+			"events": {
+				"FulfilledOrder(((address,uint256)[],(address,uint256)[],(address,uint256,bytes),address,address),address,address)": {
+					"notice": "Completed order"
+				},
+				"RelayData(address,uint256,bytes)": {
+					"notice": "External relay call at end of zap"
+				},
+				"TokenReturned(address,uint256)": {
+					"notice": "Token and amount sent to the recipient at end of a zap"
+				}
+			},
+			"kind": "user",
+			"methods": {
+				"executeOrder(((address,uint256)[],(address,uint256)[],(address,uint256,bytes),address,address),(address,uint256,bytes,(address,int32)[])[])": {
+					"notice": "Execute an order directly"
+				},
+				"pause()": {
+					"notice": "Pause the contract from carrying out any more zaps"
+				},
+				"tokenManager()": {
+					"notice": "Token manager immutable address"
+				},
+				"unpause()": {
+					"notice": "Unpause the contract to allow new zaps"
+				}
+			},
+			"notice": "Adaptable router for zapping tokens to and from Plexus vaults",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/zaps/PlexusZapRouter.sol": "PlexusZapRouter"
+		},
+		"evmVersion": "paris",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xba43b97fba0d32eb4254f6a5a297b39a19a247082a02d6e69349e071e2946218",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://fc980984badf3984b6303b377711220e067722bbd6a135b24669ff5069ef9f32",
+				"dweb:/ipfs/QmPHXMSXj99XjSVM21YsY6aNtLLjLVXDbyN76J5HQYvvrz"
+			]
+		},
+		"@openzeppelin/contracts/security/Pausable.sol": {
+			"keccak256": "0x0849d93b16c9940beb286a7864ed02724b248b93e0d80ef6355af5ef15c64773",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://4ddabb16009cd17eaca3143feadf450ac13e72919ebe2ca50e00f61cb78bc004",
+				"dweb:/ipfs/QmSPwPxX7d6TTWakN5jy5wsaGkS1y9TW8fuhGSraMkLk2B"
+			]
+		},
+		"@openzeppelin/contracts/security/ReentrancyGuard.sol": {
+			"keccak256": "0xa535a5df777d44e945dd24aa43a11e44b024140fc340ad0dfe42acf4002aade1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://41319e7f621f2dc3733511332c4fd032f8e32ad2aa7fd6f665c19741d9941a34",
+				"dweb:/ipfs/QmcYR3bd862GD1Bc7jwrU9bGxrhUu5na1oP964bDCu2id1"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x287b55befed2961a7eabd7d7b1b2839cbca8a5b80ef8dcbb25ed3d4c2002c305",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bd39944e8fc06be6dbe2dd1d8449b5336e23c6a7ba3e8e9ae5ae0f37f35283f5",
+				"dweb:/ipfs/QmPV3FGYjVwvKSgAXKUN3r9T9GwniZz83CxBpM7vyj2G53"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol": {
+			"keccak256": "0xb264c03a3442eb37a68ad620cefd1182766b58bee6cec40343480392d6b14d69",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://28879d01fd22c07b44f006612775f8577defbe459cb01685c5e25cd518c91a71",
+				"dweb:/ipfs/QmVgfkwv2Fxw6hhTcDUZhE7NkoSKjab3ipM7UaRbt6uXb5"
+			]
+		},
+		"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": {
+			"keccak256": "0xabefac93435967b4d36a4fabcbdbb918d1f0b7ae3c3d85bc30923b326c927ed1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://9d213d3befca47da33f6db0310826bcdb148299805c10d77175ecfe1d06a9a68",
+				"dweb:/ipfs/QmRgCn6SP1hbBkExUADFuDo8xkT4UU47yjNF5FhCeRbQmS"
+			]
+		},
+		"@openzeppelin/contracts/utils/Address.sol": {
+			"keccak256": "0x006dd67219697fe68d7fbfdea512e7c4cb64a43565ed86171d67e844982da6fa",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2455248c8ddd9cc6a7af76a13973cddf222072427e7b0e2a7d1aff345145e931",
+				"dweb:/ipfs/QmfYjnjRbWqYpuxurqveE6HtzsY1Xx323J428AKQgtBJZm"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0xa92e4fa126feb6907daa0513ddd816b2eb91f30a808de54f63c17d0e162c3439",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://a367861093b74443b137564d3f3c472f70bcf114739e62059c939f25e315706c",
+				"dweb:/ipfs/Qmd7JMpcxD9RuQjK3uM3EzJUgSqdN8vzp8eytEiuwxQJ6h"
+			]
+		},
+		"contracts/infra/ZapErrors.sol": {
+			"keccak256": "0x8ac5a88150c3fc9146cfaa8e8750ac040ff1523655101d3e0d2ee28f61b921c6",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://eef5ffb0bffb9873759fc9535b9ad7d8553c3bef0cf7d8fee8647526ad9d5d8f",
+				"dweb:/ipfs/QmTnKeguJomfp4yL7DpL6e9i78L2bRcrKSJumKwSrr62xh"
+			]
+		},
+		"contracts/interfaces/common/IPermit2.sol": {
+			"keccak256": "0x72405af58c7d6236c45ce2ab5d82b5f916bc0bd6a8ddb17b522dcd4e03aef5a2",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://c2f7e3f1c4bf1f369c2c5388f1528a4db58e3ca4d05fb83243ade0daab538f50",
+				"dweb:/ipfs/QmUwbvz1vWtEHQeQ6p8F7C1H928zkdHSVRyAfqEtUnf5up"
+			]
+		},
+		"contracts/interfaces/common/IPlexusTokenManager.sol": {
+			"keccak256": "0x301228f4e8028a7b66055fda69a35ffe2a8b98bbd956511b76e5ef9401c4f438",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://45d0d3dc7f4d216bcd97f0db16dfe2b83f4ee5a95103073c55637401b3b7c563",
+				"dweb:/ipfs/QmZfGj7yZu61HpNfBc2dUrANrv8iva8Epig36oCTqjAhxT"
+			]
+		},
+		"contracts/interfaces/common/IPlexusZapRouter.sol": {
+			"keccak256": "0x6fcdd7970e0526f384d8d9d5e4efa5eac1e26e0ca315d747a568f8148cea58e8",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://e1078eab9fbe7564555284fbc3f3989208b6de96c727a35f80941b9657968ebf",
+				"dweb:/ipfs/QmYnuJ9m5eUqYACGa1dfS7gZoenC3omov6DiksecHD54Uc"
+			]
+		},
+		"contracts/utils/BytesLib.sol": {
+			"keccak256": "0x14bea4a5afac523a16aa0f238e470e01d977ed1d2183197bbf9da330665d16f1",
+			"license": "Unlicense",
+			"urls": [
+				"bzz-raw://1dd5509c4874fea2183ad0c58ff30fcc94c01c716dfb7d67f9b04b8e8e4e017e",
+				"dweb:/ipfs/QmeBKhW1Gr1nEtQ8t4X13NKEzuzKsj6pxrt5o78JmzmqWB"
+			]
+		},
+		"contracts/zaps/PlexusTokenManager.sol": {
+			"keccak256": "0x315a140e5a6d60a04593b40aa020057f82c85f4282813d65d4abf873b3d6dfa4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://df5b2d3779a411233a545a9f75068eeea3ba0ba91649f0c42e7cf81d0dd207df",
+				"dweb:/ipfs/QmQfF5M1pAVmoRH7iFwq3HKLpxMmrbSTm3jM9MLZE4CWyL"
+			]
+		},
+		"contracts/zaps/PlexusZapRouter.sol": {
+			"keccak256": "0x381fd3ac04e45804e25b5322f8dd23c76711f028b422b4342f3454db57376466",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://e41ff9ac1cec7d9ea0f9e12eee2f8e2abef77593cbf9239cbe3f342b5d9dbf85",
+				"dweb:/ipfs/Qmbk6XZsFYnhJmoKdvaCYSsFapM99UY1iqMTRATwKjN4Hm"
+			]
+		}
+	},
+	"version": 1
+}

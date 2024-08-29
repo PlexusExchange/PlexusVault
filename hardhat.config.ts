@@ -10,11 +10,10 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
-      gas: 30000000, // 원하는 가스 리밋 값으로 조절
-      gasPrice: 150000000000, // 100000000 => 0.1gwei 50000000000 => 50gwei
-
+      // gas: 30000000, // 원하는 가스 리밋 값으로 조절
+      // gasPrice: 150000000000, // 100000000 => 0.1gwei 50000000000 => 50gwei
       forking: {
-        url: process.env.MAIN_POLYGON_URL as string,
+        url: process.env.MAIN_OP_URL as string,
       },
     },
     ETH: {
@@ -115,6 +114,15 @@ const config: HardhatUserConfig = {
           },
         },
       },
+      {
+        version: "0.6.12",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200,
+          },
+        },
+      },
     ],
   },
   paths: {
@@ -136,6 +144,9 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: process.env[networkName + "_APIKEY"],
+  },
+  sourcify: {
+    enabled: true,
   },
 };
 

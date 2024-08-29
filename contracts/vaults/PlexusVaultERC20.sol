@@ -9,13 +9,14 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../utils/Pausable.sol";
 import "../interfaces/plexus/IStrategy.sol";
 import "../interfaces/plexus/IBeefyVaultV7.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Implementation of a vault to deposit funds for yield optimizing.
  * This is the contract that receives funds and that users interface with.
  * The yield optimizing strategy itself is implemented in a separate 'Strategy.sol' contract.
  */
-contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable,Pausable {
+contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, Pausable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     struct StratCandidate {
@@ -35,8 +36,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
     event Deposit(address indexed user, uint256 shares, uint256 amount0, uint256 amount1, uint256 fee0, uint256 fee1);
     event Withdraw(address indexed user, uint256 shares, uint256 amount0, uint256 amount1);
 
-
-
     /**
      * @dev Sets the value of {token} to the token that the vault will
      * hold as underlying value. It initializes the vault's own 'plxv' token
@@ -54,7 +53,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         strategy = IStrategy(_strategy);
         approvalDelay = _approvalDelay;
     }
-
 
     function want() public view returns (IERC20Upgradeable) {
         return IERC20Upgradeable(strategy.want());
@@ -94,8 +92,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         deposit(want().balanceOf(msg.sender));
     }
 
-    
-
     /**
      * @dev The entrypoint of funds into the system. People deposit with this function
      * into the vault. The vault is then in charge of sending funds into the strategy.
@@ -113,7 +109,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         } else {
             shares = (_amount * totalSupply()) / _pool;
         }
-        emit Deposit( msg.sender,  shares,  uint256(_amount),0, 0,0);
+        emit Deposit(msg.sender, shares, uint256(_amount), 0, 0, 0);
         _mint(msg.sender, shares);
     }
 
@@ -140,7 +136,6 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
      * tokens are burned in the process.
      */
     function withdraw(uint256 _shares) public {
-  
         uint256 r = (balance() * _shares) / totalSupply();
         _burn(msg.sender, _shares);
         uint b = want().balanceOf(address(this));
@@ -153,9 +148,13 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
                 r = b + _diff;
             }
         }
-        
-        emit Withdraw(msg.sender, _shares, r,0);
+
+        emit Withdraw(msg.sender, _shares, r, 0);
         want().safeTransfer(msg.sender, r);
+    }
+
+    function withdrawEstimate(uint256 _shares) public view returns (uint256) {
+        return (balance() * _shares) / totalSupply();
     }
 
     /**

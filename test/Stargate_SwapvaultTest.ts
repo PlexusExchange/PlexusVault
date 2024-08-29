@@ -26,6 +26,7 @@ describe("VaultTest", function () {
   let plexusZapRouter: PlexusZapRouter;
   let plexusTokenManager: PlexusTokenManager;
   let mainUser: HardhatEthersSigner;
+  let usdt_whale: HardhatEthersSigner;
   let testPlexusVaultERC20_address: string;
   let plexusTokenManager_address: string;
   let devUser: string;
@@ -43,6 +44,7 @@ describe("VaultTest", function () {
   const STRATEGIST = "0x0Bb989a2593E7513B44ae408F1e3191E0183b20a";
   const USDT_WHALE = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
   const ONEINCH = "0x111111125421cA6dc452d289314280a0f8842A65";
+  const NATIVE = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
   const V2_USDT_FARM = "0x4694900bdba99edf07a2e46c4093f88f9106a90d";
   const V2_USDT_POOL = "0xd47b03ee6d86Cf251ee7860FB2ACf9f91B9fD4d7";
@@ -53,8 +55,15 @@ describe("VaultTest", function () {
       method: "hardhat_impersonateAccount",
       params: [mainUserAddress],
     });
+    //91113475966
+    await network.provider.request({
+      method: "hardhat_impersonateAccount",
+      params: [USDT_WHALE],
+    });
 
     mainUser = await ethers.getSigner(mainUserAddress);
+
+    usdt_whale = await ethers.getSigner(USDT_WHALE);
 
     console.log("mainUser", mainUser.address);
 
@@ -116,7 +125,7 @@ describe("VaultTest", function () {
   });
 
   it("should initialize contracts", async function () {
-    await plexusFeeConfigurator.initialize(WNATIVE, ethers.parseEther("0.05")); // 5% fee
+    await plexusFeeConfigurator.initialize(KEEPER, ethers.parseEther("0.05")); // 5% fee
 
     await plexusFeeConfigurator.setFeeCategory(
       0,
@@ -176,8 +185,8 @@ describe("VaultTest", function () {
       USDT_ADDRESS,
       swapInfo_oneinch_WMATIC_USDT
     );
+    await strategyStargateV2.setRewardMinAmount(STG_ADDRESS, 10000000000000);
   });
-
   //USDT pool
   it("should deposit to vault", async function () {
     const usdt = await ethers.getContractAt(IERC20_SOURCE, USDT_ADDRESS);
@@ -186,19 +195,18 @@ describe("VaultTest", function () {
     console.log("CHECK CONSOLE", depositAmount);
 
     await usdt
-      .connect(mainUser)
+      .connect(usdt_whale)
       .approve(testPlexusVaultERC20_address, depositAmount);
     console.log("CHECK CONSOLE");
 
     console.log(
       "usdt ALLOWANCe",
-      await usdt.allowance(mainUser, testPlexusVaultERC20_address)
+      await usdt.allowance(usdt_whale, testPlexusVaultERC20_address)
     );
 
-    await testPlexusVaultERC20.connect(mainUser).deposit(depositAmount);
+    await testPlexusVaultERC20.connect(usdt_whale).deposit(depositAmount);
     console.log("CHECK CONSOLE");
   });
-
   //USDC -> swap -> USDT pool
   //note : https://polygonscan.com/tx/0x2d5654cc371668a9abd6fc446811c379c9cade8b5f36613399b5ed140d196a2c
   it("should swap-deposit to zapRouter", async function () {
@@ -209,10 +217,10 @@ describe("VaultTest", function () {
     const oneInchCallData = await fetchOneInchData(
       //1inch swap하고 받는곳 zapRouter로 설정.
       await plexusZapRouter.getAddress(),
-      USDC_ADDRESS,
+      NATIVE,
       USDT_ADDRESS,
       137,
-      5000000
+      20000000000000000000
     );
 
     console.log(
@@ -222,38 +230,41 @@ describe("VaultTest", function () {
       oneInchCallData.tx.data
     );
 
-    const usdc = await ethers.getContractAt(IERC20_SOURCE, USDC_ADDRESS);
+    // const usdc = await ethers.getContractAt(IERC20_SOURCE, USDC_ADDRESS);
 
-    const depositAmount = ethers.parseUnits("5", 6);
-    console.log("CHECK CONSOLE", depositAmount);
+    // const depositAmount = ethers.parseUnits("5", 6);
+    // console.log("CHECK CONSOLE", depositAmount);
 
-    await usdc
-      .connect(mainUser)
-      .approve(plexusTokenManager_address, depositAmount);
-    console.log("CHECK CONSOLE");
+    // await usdc
+    //   .connect(mainUser)
+    //   .approve(plexusTokenManager_address, depositAmount);
+    // console.log("CHECK CONSOLE");
 
-    console.log(
-      await plexusZapRouter.tokenManager(),
-      plexusTokenManager_address
-    );
+    // console.log(
+    //   await plexusZapRouter.tokenManager(),
+    //   plexusTokenManager_address
+    // );
 
-    console.log(
-      "usdc ALLOWANCE",
-      await usdc.allowance(mainUser, plexusTokenManager_address)
-    );
+    // console.log(
+    //   "usdc ALLOWANCE",
+    //   await usdc.allowance(mainUser, plexusTokenManager_address)
+    // );
 
     console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
     const order = {
       inputs: [
         {
-          token: USDC_ADDRESS,
-          amount: "5000000",
+          token: NATIVE,
+          amount: "20000000000000000000",
         },
       ],
       outputs: [
-        { token: testPlexusVaultERC20_address, minOutputAmount: "4000000" },
+        { token: testPlexusVaultERC20_address, minOutputAmount: "0" },
         { token: USDT_ADDRESS, minOutputAmount: "0" },
-        { token: USDC_ADDRESS, minOutputAmount: "0" },
+        {
+          token: NATIVE,
+          minOutputAmount: "0",
+        },
       ],
       relay: {
         target: "0x0000000000000000000000000000000000000000",
@@ -265,25 +276,36 @@ describe("VaultTest", function () {
     };
 
     const route = [
-      {
-        target: oneInchCallData.tx.to,
-        value: "0",
-        data: oneInchCallData.tx.data,
-        tokens: [{ token: USDC_ADDRESS, index: -1 }],
-      },
-      {
-        target: testPlexusVaultERC20_address,
-        value: "0",
-        data: "0xde5f6268",
-        tokens: [{ token: USDT_ADDRESS, index: -1 }],
-      },
+      [
+        oneInchCallData.tx.to,
+        "20000000000000000000",
+        oneInchCallData.tx.data,
+        [{ token: NATIVE, index: -1 }],
+      ],
+      [
+        testPlexusVaultERC20_address,
+        "0",
+        "0xde5f6268",
+        [{ token: USDT_ADDRESS, index: -1 }],
+      ],
     ];
 
-    await plexusZapRouter.connect(mainUser).executeOrder(order, route);
+    const valueToSend = ethers.parseEther("20");
+    console.log("executeOrder START");
+    await plexusZapRouter.connect(mainUser).executeOrder(order, route, {
+      value: valueToSend,
+    });
 
     console.log("zapRouter deposit clear");
+    console.log(
+      "await testPlexusVaultERC20.decimal()",
+      await testPlexusVaultERC20.decimals()
+    );
+    console.log(
+      "await testPlexusVaultERC20.balanceOf(mainUser)",
+      await testPlexusVaultERC20.balanceOf(mainUser)
+    );
   });
-
   it("should depost to zapRouter (Non swap)", async function () {
     const usdt = await ethers.getContractAt(IERC20_SOURCE, USDT_ADDRESS);
 
@@ -291,7 +313,7 @@ describe("VaultTest", function () {
     // console.log("CHECK CONSOLE", depositAmount);
 
     await usdt
-      .connect(mainUser)
+      .connect(usdt_whale)
       .approve(plexusTokenManager_address, depositAmount);
     // console.log("CHECK CONSOLE");
 
@@ -305,7 +327,7 @@ describe("VaultTest", function () {
     //   await usdt.allowance(mainUser, plexusTokenManager_address)
     // );
 
-    // console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
+    console.log("testPlexusVaultERC20_address", testPlexusVaultERC20_address);
     const order = {
       inputs: [
         {
@@ -322,8 +344,8 @@ describe("VaultTest", function () {
         value: "0",
         data: "0x",
       },
-      user: mainUser,
-      recipient: mainUser,
+      user: usdt_whale,
+      recipient: usdt_whale,
     };
 
     const route = [
@@ -335,7 +357,15 @@ describe("VaultTest", function () {
       },
     ];
 
-    // await plexusZapRouter.connect(mainUser).executeOrder(order, route);
-    // console.log("zapRouter deposit clear (non swap)");
+    await plexusZapRouter.connect(usdt_whale).executeOrder(order, route);
+    console.log("zapRouter deposit clear (non swap)");
+    console.log(
+      "await testPlexusVaultERC20.decimal()",
+      await testPlexusVaultERC20.decimals()
+    );
+    console.log(
+      "await testPlexusVaultERC20.balanceOf(usdt_whale)",
+      await testPlexusVaultERC20.balanceOf(usdt_whale)
+    );
   });
 });

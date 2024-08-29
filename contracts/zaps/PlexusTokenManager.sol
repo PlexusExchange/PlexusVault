@@ -40,7 +40,7 @@ contract PlexusTokenManager is ZapErrors {
             unchecked {
                 ++i;
             }
-            if (input.token == address(0)) continue;
+            if (input.token == address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE)) continue;
             IERC20(input.token).safeTransferFrom(_user, msg.sender, input.amount);
         }
     }

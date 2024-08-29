@@ -1,7 +1,7 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const HelloWorld = await ethers.getContractFactory("PlexusVaultERC20");
+  const HelloWorld = await ethers.getContractFactory("StrategyHop");
   const helloWorld = await HelloWorld.deploy();
   await helloWorld.waitForDeployment();
   console.log("HelloWorld deployed to:", helloWorld.target);

@@ -2,11 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
 import "../../interfaces/common/IERC20Extended.sol";
 import "../Common/StratFeeManagerInitializable.sol";
 import "../../interfaces/plexus/IPlexusSwapper.sol";
-
 import "../../utils/UniV3Actions.sol";
 import "../../utils/UniswapV3Utils.sol";
 
@@ -34,20 +32,15 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
     ICometRewards public constant rewards = ICometRewards(0x45939657d1CA34A8FA39A924B71D28Fe8431e581);
     bool public harvestOnDeposit;
     uint256 public lastHarvest;
-    
     bytes public outputToNativePath;
     bytes public nativeToWantPath;
-    
 
     event StratHarvest(address indexed harvester, uint256 wantHarvested, uint256 tvl);
     event Deposit(uint256 tvl);
     event Withdraw(uint256 tvl);
     event ChargedFees(uint256 callFees);
 
-    function initialize(
-        address _cToken,
-        CommonAddresses calldata _commonAddresses
-     ) public initializer  {
+    function initialize(address _cToken, CommonAddresses calldata _commonAddresses) public initializer {
         __StratFeeManager_init(_commonAddresses);
         cToken = _cToken;
         want = IComet(cToken).baseToken();
@@ -83,7 +76,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         }
 
         if (tx.origin != owner() && !paused()) {
-            uint256 withdrawalFeeAmount = _amount * withdrawalFee / WITHDRAWAL_MAX;
+            uint256 withdrawalFeeAmount = (_amount * withdrawalFee) / WITHDRAWAL_MAX;
             _amount = _amount - withdrawalFeeAmount;
         }
 
@@ -102,8 +95,6 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
     function harvest() external virtual {
         _harvest();
     }
-
-  
 
     // compounds earnings and charges performance fee
     function _harvest() internal whenNotPaused {
@@ -125,9 +116,7 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         uint bal = IERC20(output).balanceOf(address(this));
         if (bal > 0) {
             IPlexusSwapper(swapper).swap(output, wnative, bal);
-
         }
-         
     }
 
     // performance fees
@@ -192,7 +181,6 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
 
     // pauses deposits and withdraws all funds from third party systems.
     function panic() public onlyManager {
-
         IComet(cToken).withdraw(want, balanceOfPool());
         pause();
     }
@@ -221,8 +209,4 @@ contract StrategyCompoundV3 is StratFeeManagerInitializable {
         IERC20(wnative).approve(swapper, 0);
         IERC20(want).approve(cToken, 0);
     }
-
-   
-
-    
 }
