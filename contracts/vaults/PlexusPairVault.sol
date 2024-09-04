@@ -83,6 +83,24 @@ contract PlexusPairVault is ReentrancyGuard {
         );
     }
 
+    function lpTotalSupply() external view returns (uint256) {
+        return pair.totalSupply();
+    }
+
+    function lpToken0Balance() external view returns (uint256) {
+        return IERC20(pair.token0()).balanceOf(address(pair));
+    }
+
+    function lpToken1Balance() external view returns (uint256) {
+        return IERC20(pair.token1()).balanceOf(address(pair));
+    }
+
+    function lpDetail() external view returns (uint256 _lpTotalSupply, uint256 _token0Balance, uint256 _token1Balance) {
+        _lpTotalSupply = this.lpTotalSupply();
+        _token0Balance = this.lpToken0Balance();
+        _token1Balance = this.lpToken1Balance();
+    }
+
     function _after() internal {
         uint256 balPLX = _balance(PLX);
         uint256 balWETH = _balance(WETH);
