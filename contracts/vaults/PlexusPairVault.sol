@@ -20,10 +20,7 @@ contract PlexusPairVault is ReentrancyGuard {
         pair = _pair;
     }
 
-    function previewDeposit(
-        uint amountWETH,
-        uint amountPLX
-    ) external view returns (uint) {
+    function previewDeposit(uint amountWETH, uint amountPLX) external view returns (uint) {
         (uint112 reserve0, uint112 reserve1, ) = pair.getReserves();
         uint totalSupply = pair.totalSupply();
 
@@ -32,29 +29,18 @@ contract PlexusPairVault is ReentrancyGuard {
         uint lpTokensForAmount0 = (amountWETH * totalSupply) / reserve0;
         uint lpTokensForAmount1 = (amountPLX * totalSupply) / reserve1;
 
-        return
-            lpTokensForAmount0 < lpTokensForAmount1
-                ? lpTokensForAmount0
-                : lpTokensForAmount1;
+        return lpTokensForAmount0 < lpTokensForAmount1 ? lpTokensForAmount0 : lpTokensForAmount1;
     }
 
-    function previewWithdraw(
-        uint256 liquidity
-    ) public view returns (uint256 amountWETH, uint256 amountPLX) {
-        (uint256 reserveA, uint256 reserveB, ) = IUniswapV2Pair(pair)
-            .getReserves();
+    function previewWithdraw(uint256 liquidity) public view returns (uint256 amountWETH, uint256 amountPLX) {
+        (uint256 reserveA, uint256 reserveB, ) = IUniswapV2Pair(pair).getReserves();
         uint256 totalSupply = IUniswapV2Pair(pair).totalSupply();
 
         amountWETH = (liquidity * reserveA) / totalSupply;
         amountPLX = (liquidity * reserveB) / totalSupply;
     }
 
-    function deposit(
-        uint amountWETH,
-        uint amountPLX,
-        uint256 amountWETHMin,
-        uint256 amountPLXMin
-    ) external payable nonReentrant {
+    function deposit(uint amountWETH, uint amountPLX, uint256 amountWETHMin, uint256 amountPLXMin) external payable nonReentrant {
         IERC20(WETH).safeTransferFrom(msg.sender, address(this), amountWETH);
         IERC20(PLX).safeTransferFrom(msg.sender, address(this), amountPLX);
         _deposit(amountWETH, amountPLX, amountWETHMin, amountPLXMin);
@@ -63,39 +49,34 @@ contract PlexusPairVault is ReentrancyGuard {
 
     function withdraw(uint256 amountLP) public {
         (uint256 amountA, uint256 amountB) = previewWithdraw(amountLP);
-        router.removeLiquidity(
-            WETH,
-            PLX,
-            amountLP,
-            amountA,
-            amountB,
-            msg.sender,
-            block.timestamp + 600
-        );
+        router.removeLiquidity(WETH, PLX, amountLP, amountA, amountB, msg.sender, block.timestamp + 600);
     }
 
     function _balance(address token) internal view returns (uint256) {
         return IERC20(token).balanceOf(address(this));
     }
 
-    function _deposit(
-        uint amountA,
-        uint amountB,
-        uint256 amountAMin,
-        uint256 amountBMin
-    ) internal {
+    function lpTotalSupply() external view returns (uint256) {
+        return pair.totalSupply();
+    }
+
+    function lpToken0Balance() external view returns (uint256) {
+        return IERC20(pair.token0()).balanceOf(address(pair));
+    }
+
+    function lpToken1Balance() external view returns (uint256) {
+        return IERC20(pair.token1()).balanceOf(address(pair));
+    }
+
+    function lpDetail() external view returns (uint256 _lpTotalSupply, uint256 _token0Balance, uint256 _token1Balance) {
+        _lpTotalSupply = this.lpTotalSupply();
+        _token0Balance = this.lpToken0Balance();
+        _token1Balance = this.lpToken1Balance();
+    }
+    function _deposit(uint amountA, uint amountB, uint256 amountAMin, uint256 amountBMin) internal {
         IERC20(WETH).safeApprove(address(router), amountA);
         IERC20(PLX).safeApprove(address(router), amountB);
-        router.addLiquidity(
-            WETH,
-            PLX,
-            amountA,
-            amountB,
-            amountAMin,
-            amountBMin,
-            msg.sender,
-            block.timestamp + 600
-        );
+        router.addLiquidity(WETH, PLX, amountA, amountB, amountAMin, amountBMin, msg.sender, block.timestamp + 600);
     }
 
     function _after() internal {
