@@ -9,7 +9,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../utils/Pausable.sol";
 import "../interfaces/plexus/IStrategy.sol";
 import "../interfaces/plexus/IBeefyVaultV7.sol";
-import "hardhat/console.sol";
 
 /**
  * @dev Implementation of a vault to deposit funds for yield optimizing.
@@ -33,8 +32,8 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
 
     event NewStratCandidate(address implementation);
     event UpgradeStrat(address implementation);
-    event Deposit(address indexed user, uint256 shares, uint256 amount0, uint256 amount1, uint256 fee0, uint256 fee1);
-    event Withdraw(address indexed user, uint256 shares, uint256 amount0, uint256 amount1);
+    event Deposit(uint256 shares, uint256 amount0, uint256 amount1, uint256 fee0, uint256 fee1);
+    event Withdraw(uint256 shares, uint256 amount0, uint256 amount1);
 
     /**
      * @dev Sets the value of {token} to the token that the vault will
@@ -109,7 +108,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
         } else {
             shares = (_amount * totalSupply()) / _pool;
         }
-        emit Deposit(msg.sender, shares, uint256(_amount), 0, 0, 0);
+        emit Deposit(shares, uint256(_amount), 0, 0, 0);
         _mint(msg.sender, shares);
     }
 
@@ -149,7 +148,7 @@ contract PlexusVaultERC20 is ERC20Upgradeable, OwnableUpgradeable, ReentrancyGua
             }
         }
 
-        emit Withdraw(msg.sender, _shares, r, 0);
+        emit Withdraw(_shares, r, 0);
         want().safeTransfer(msg.sender, r);
     }
 

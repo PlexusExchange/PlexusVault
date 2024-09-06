@@ -9,7 +9,6 @@ import "../../interfaces/common/IWrappedNative.sol";
 import "../../interfaces/common/IERC20Extended.sol";
 import "../../interfaces/plexus/IPlexusSwapper.sol";
 import "../Common/StratFeeManagerInitializable.sol";
-import "hardhat/console.sol";
 
 contract StrategyStargateV2 is StratFeeManagerInitializable {
     using SafeERC20 for IERC20;
@@ -134,6 +133,14 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
             }
         }
     }
+
+    function _swapToWant(address tokenFrom, address tokenTo) internal {
+        uint256 amount = IERC20(tokenFrom).balanceOf(address(this));
+        if (amount > minAmounts[tokenFrom]) {
+            IPlexusSwapper(swapper).swap(tokenFrom, tokenTo, amount);
+        }
+    }
+
     // performance fees
     function _chargeFees() internal {
         IFeeConfig.FeeCategory memory fees = getFees();
@@ -141,11 +148,6 @@ contract StrategyStargateV2 is StratFeeManagerInitializable {
         uint256 plexusFeeAmount = (wnativeBal * fees.plexus) / DIVISOR;
         IERC20(wnative).safeTransfer(plexusFeeRecipient, plexusFeeAmount);
         emit ChargedFees(plexusFeeAmount);
-    }
-
-    function _swapToWant(address tokenFrom, address tokenTo) internal {
-        uint bal = IERC20(tokenFrom).balanceOf(address(this));
-        IPlexusSwapper(swapper).swap(tokenFrom, tokenTo, bal);
     }
 
     function rewardsLength() external view returns (uint) {

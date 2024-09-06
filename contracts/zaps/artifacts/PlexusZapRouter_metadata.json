@@ -598,7 +598,7 @@
 			"bytecodeHash": "ipfs"
 		},
 		"optimizer": {
-			"enabled": true,
+			"enabled": false,
 			"runs": 200
 		},
 		"remappings": []
@@ -709,19 +709,19 @@
 			]
 		},
 		"contracts/zaps/PlexusTokenManager.sol": {
-			"keccak256": "0x315a140e5a6d60a04593b40aa020057f82c85f4282813d65d4abf873b3d6dfa4",
+			"keccak256": "0xcf93934f752afe313a023a9e419dfd95166db95d8a6a27ea91787ac37038ad57",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://df5b2d3779a411233a545a9f75068eeea3ba0ba91649f0c42e7cf81d0dd207df",
-				"dweb:/ipfs/QmQfF5M1pAVmoRH7iFwq3HKLpxMmrbSTm3jM9MLZE4CWyL"
+				"bzz-raw://a356aa3bf68d7a444723f9ac27dd57d5800eaaed4836b333458e10dbdd6375ac",
+				"dweb:/ipfs/Qmcws1aMfLfGn5n73XJNnKV58qVnDMHTb96P1sEZ1zPYTh"
 			]
 		},
 		"contracts/zaps/PlexusZapRouter.sol": {
-			"keccak256": "0x381fd3ac04e45804e25b5322f8dd23c76711f028b422b4342f3454db57376466",
+			"keccak256": "0xe3e2d8a563ebc3b682c0eb8df3a80fb348ee55367c92b2b3666c4b7ce73423b2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e41ff9ac1cec7d9ea0f9e12eee2f8e2abef77593cbf9239cbe3f342b5d9dbf85",
-				"dweb:/ipfs/Qmbk6XZsFYnhJmoKdvaCYSsFapM99UY1iqMTRATwKjN4Hm"
+				"bzz-raw://41aed4029740cda7c15ca1c9736595b3b6514f0c2a31cdd822a161e23205b2c9",
+				"dweb:/ipfs/QmXpvdHEfUd3c9xek7XcZuXJsmg7xpiKFCadk7qBDFr6PH"
 			]
 		}
 	},

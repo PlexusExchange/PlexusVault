@@ -11,7 +11,6 @@ import {IPlexusTokenManager} from "../interfaces/common/IPlexusTokenManager.sol"
 import {IPlexusZapRouter} from "../interfaces/common/IPlexusZapRouter.sol";
 import {PlexusTokenManager} from "./PlexusTokenManager.sol";
 import {ZapErrors} from "../infra/ZapErrors.sol";
-import "hardhat/console.sol";
 /**
  * @title Zap router for Plexus vaults
  * @notice Adaptable router for zapping tokens to and from Plexus vaults
@@ -60,7 +59,6 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
     function executeOrder(Order calldata _order, Step[] calldata _route) external payable nonReentrant whenNotPaused {
         if (msg.sender != _order.user) revert InvalidCaller(_order.user, msg.sender);
         IPlexusTokenManager(tokenManager).pullTokens(_order.user, _order.inputs);
-        console.log("HERE?");
         _executeOrder(_order, _route);
     }
 
@@ -110,7 +108,6 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
                     value = address(this).balance;
                 } else {
                     balance = IERC20(stepTokenAddress).balanceOf(address(this));
-                    console.log("stepTokenAddress balance", balance);
                     _approveToken(stepTokenAddress, stepTarget, balance);
                     if (stepTokenIndex >= 0) {
                         uint256 idx = uint256(int256(stepTokenIndex));
@@ -122,13 +119,7 @@ contract PlexusZapRouter is IPlexusZapRouter, ZapErrors, Ownable, Pausable, Reen
                     ++j;
                 }
             }
-            console.log("stepTarget", stepTarget);
-            console.log("value", value);
             (bool success, bytes memory result) = stepTarget.call{value: value}(callData);
-            console.log("success");
-            console.log(success);
-            console.log("callData");
-            console.logBytes(callData);
 
             if (!success) _propagateError(stepTarget, value, callData, result);
 
