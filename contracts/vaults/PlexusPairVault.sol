@@ -15,6 +15,9 @@ contract PlexusPairVault is ReentrancyGuard {
     address public PLX = 0xFB853ACEa0E76f73F8274B521FE1611C888670Cc;
     address public WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
 
+    event Deposit(address user, uint _liquidity, uint _amountA, uint _amountB, uint fee0, uint fee1);
+    event Withdraw(address user, uint _liquidity, uint amountA, uint amountB);
+
     constructor(IUniswapV2Router02 _router, IUniswapV2Pair _pair) {
         router = _router;
         pair = _pair;
@@ -43,17 +46,41 @@ contract PlexusPairVault is ReentrancyGuard {
     function deposit(uint amountWETH, uint amountPLX, uint256 amountWETHMin, uint256 amountPLXMin) external payable nonReentrant {
         IERC20(WETH).safeTransferFrom(msg.sender, address(this), amountWETH);
         IERC20(PLX).safeTransferFrom(msg.sender, address(this), amountPLX);
-        _deposit(amountWETH, amountPLX, amountWETHMin, amountPLXMin);
+        (uint amountA, uint amountB, uint liquidity) = _deposit(amountWETH, amountPLX, amountWETHMin, amountPLXMin);
         _after();
+        emit Deposit(msg.sender, liquidity, amountA, amountB, 0, 0);
     }
 
     function withdraw(uint256 amountLP) public {
+        IERC20(address(pair)).safeTransferFrom(msg.sender, address(this), amountLP);
+        IERC20(address(pair)).forceApprove(address(router), amountLP);
         (uint256 amountA, uint256 amountB) = previewWithdraw(amountLP);
         router.removeLiquidity(WETH, PLX, amountLP, amountA, amountB, msg.sender, block.timestamp + 600);
+        emit Withdraw(msg.sender, amountLP, amountA, amountB);
     }
 
     function _balance(address token) internal view returns (uint256) {
         return IERC20(token).balanceOf(address(this));
+    }
+
+    function _deposit(
+        uint amountA,
+        uint amountB,
+        uint256 amountAMin,
+        uint256 amountBMin
+    ) internal returns (uint amountWETH, uint amountPLX, uint liquidity) {
+        IERC20(WETH).forceApprove(address(router), amountA);
+        IERC20(PLX).forceApprove(address(router), amountB);
+        (amountWETH, amountPLX, liquidity) = router.addLiquidity(
+            WETH,
+            PLX,
+            amountA,
+            amountB,
+            amountAMin,
+            amountBMin,
+            msg.sender,
+            block.timestamp + 600
+        );
     }
 
     function lpTotalSupply() external view returns (uint256) {
@@ -72,11 +99,6 @@ contract PlexusPairVault is ReentrancyGuard {
         _lpTotalSupply = this.lpTotalSupply();
         _token0Balance = this.lpToken0Balance();
         _token1Balance = this.lpToken1Balance();
-    }
-    function _deposit(uint amountA, uint amountB, uint256 amountAMin, uint256 amountBMin) internal {
-        IERC20(WETH).safeApprove(address(router), amountA);
-        IERC20(PLX).safeApprove(address(router), amountB);
-        router.addLiquidity(WETH, PLX, amountA, amountB, amountAMin, amountBMin, msg.sender, block.timestamp + 600);
     }
 
     function _after() internal {
