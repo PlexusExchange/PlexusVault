@@ -15,8 +15,8 @@ contract PlexusPairVault is ReentrancyGuard {
     address public PLX = 0xFB853ACEa0E76f73F8274B521FE1611C888670Cc;
     address public WETH = 0x82aF49447D8a07e3bd95BD0d56f35241523fBab1;
 
-    event Deposit(address user, uint _liquidity, uint _amountA, uint _amountB, uint fee0, uint fee1);
-    event Withdraw(address user, uint _liquidity, uint amountA, uint amountB);
+    event Deposit(uint shares, uint amount0, uint amount1, uint fee0, uint fee1);
+    event Withdraw(uint shares, uint amount0, uint amount1);
 
     constructor(IUniswapV2Router02 _router, IUniswapV2Pair _pair) {
         router = _router;
@@ -48,7 +48,7 @@ contract PlexusPairVault is ReentrancyGuard {
         IERC20(PLX).safeTransferFrom(msg.sender, address(this), amountPLX);
         (uint amountA, uint amountB, uint liquidity) = _deposit(amountWETH, amountPLX, amountWETHMin, amountPLXMin);
         _after();
-        emit Deposit(msg.sender, liquidity, amountA, amountB, 0, 0);
+        emit Deposit(liquidity, amountA, amountB, 0, 0);
     }
 
     function withdraw(uint256 amountLP) public {
@@ -56,7 +56,7 @@ contract PlexusPairVault is ReentrancyGuard {
         IERC20(address(pair)).forceApprove(address(router), amountLP);
         (uint256 amountA, uint256 amountB) = previewWithdraw(amountLP);
         router.removeLiquidity(WETH, PLX, amountLP, amountA, amountB, msg.sender, block.timestamp + 600);
-        emit Withdraw(msg.sender, amountLP, amountA, amountB);
+        emit Withdraw(amountLP, amountA, amountB);
     }
 
     function _balance(address token) internal view returns (uint256) {
